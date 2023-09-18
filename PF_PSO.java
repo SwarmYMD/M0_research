@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +51,7 @@ class Grid{
     int[][] agent_pos = new int[Variable.N][Variable.M];
     double[][] pherData = new double[Variable.N][Variable.M];
     double[][] areaPherData = new double[Variable.n][Variable.m];
+    boolean[] vacant = new boolean[Variable.n * Variable.m];
 
     Grid(){
         this.h = grid.length;
@@ -76,6 +78,7 @@ class Grid{
                 areaPherData[i][j] = 0;
             }
         }
+        Arrays.fill(vacant, false);
     }
 
     void recordPos(Agent agent){
@@ -195,6 +198,7 @@ class Agent{
         // if all pattern grids are occupied, changing mode(otherwise, continuing dispersion mode)
         if(count == 0){
             state.replace("d", "e");
+            grid.vacant[areaNo] = true;
             System.out.printf("mode changed.\n");
         } else if(grid.table[row][col] != 1){
             move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
@@ -232,12 +236,6 @@ class Agent{
         pld_col = leftEnd + a;
         pld_row = upperEnd + b;
 
-        /*
-        System.out.printf("now: (%d, %d)\n\n", row, col);
-
-        System.out.printf("upper, left: (%d, %d)\n", upperEnd, leftEnd);
-        System.out.printf("b, a: (%d, %d)\n", b, a);
-        */
         System.out.printf("pld: (%d, %d)\n", pld_row, pld_col);
         
         // move to the next position
@@ -249,28 +247,57 @@ class Agent{
 
         System.out.printf("x: (%d, %d)\n", x_row, x_col);
         
-        grid.deletePos(this);
-
-        if(x_col >= leftEnd && x_col <= rightEnd){
-            col = x_col;
-        } else if(x_col < leftEnd){
-            col = leftEnd;
+        // prevent going over other area
+        if(x_col < leftEnd){
+            x_col = leftEnd;
         } else{
-            col = rightEnd;
+            x_col = rightEnd;
         }
 
-        if(x_row >= upperEnd && x_row <= lowerEnd){
-            row = x_row;
-        } else if(x_row < upperEnd){
-            row = upperEnd;
+        if(x_row < upperEnd){
+            x_row = upperEnd;
         } else{
-            row = lowerEnd;
+            x_row = lowerEnd;
         }
 
         /*
-        col = pld_col;
-        row = pld_row;
+        // check the next position that is unoccupied pattern grid
+        List<List<Integer>> neighbors = new ArrayList<List<Integer>>(); 
+        System.out.printf("pattern grid?: %d\n", grid.table[x_row][x_col]);
+        while(grid.table[x_row][x_col] == 1){
+            if(grid.occupied[x_row][x_col] == 1){
+                neighbors.add(Arrays.asList(x_row,x_col-1));
+                neighbors.add(Arrays.asList(x_row,x_col+1));
+                neighbors.add(Arrays.asList(x_row-1,x_col));
+                neighbors.add(Arrays.asList(x_row+1,x_col));
+                Collections.shuffle(neighbors);
+
+                x_row = neighbors.get(0).get(0);
+                x_col = neighbors.get(0).get(1);
+
+                neighbors.clear();
+
+                // prevent going over other area
+                if(x_col < leftEnd){
+                    x_col = leftEnd;
+                } else{
+                    x_col = rightEnd;
+                }
+
+                if(x_row < upperEnd){
+                    x_row = upperEnd;
+                } else{
+                    x_row = lowerEnd;
+                }
+            }
+        }
+
         */
+
+        grid.deletePos(this);
+
+        col = x_col;
+        row = x_row;
 
         grid.recordPos(this);
 
@@ -281,24 +308,12 @@ class Agent{
         System.out.print(areaNo);
         System.out.println();
 
-        /*
-
-        for(int i=0; i<Variable.H; i++){
-            for(int j=0; j<Variable.W; j++){
-                System.out.printf("%f,", subPherMatrix[i][j]);
-            }
-            System.out.println();
-        }
-        */
-
         for(int i=0; i<Variable.H; i++){
             for(int j=0; j<Variable.W; j++){
                 System.out.printf("%f,", disIndicMatrix[i][j]);
             }
             System.out.println();
         }
-
-        // System.out.printf("pld: (%d, %d)\n", pld_row, pld_col);
     }
 
     int maxIndex(double[][] indic){
@@ -365,15 +380,15 @@ public class PF_PSO{
 
         System.out.println();
 
+        for(int i=0; i<Variable.N; i++){
+            for(int j=0; j<Variable.M; j++){
+                System.out.printf("%d", grid.table[i][j]);
+            }
+        System.out.println();
+        }
+
         if(agents[0].state.equals("d")){
             agents[0].dispersion(grid); 
-            
-            for(int i=0; i<Variable.N; i++){
-            for(int j=0; j<Variable.M; j++){
-                System.out.print(grid.agent_pos[i][j]);
-            }
-            System.out.println();
-        }
         }
 
         /*
