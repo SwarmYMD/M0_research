@@ -17,7 +17,7 @@ class Variable{
     public static final int AGENT_NUM = 100;
     public static final double alpha = 0.9;
     public static final double c = 0.8;
-    public static final int maxStep = 10000;
+    public static final int maxStep = 100;
 }
 
 class Grid{
@@ -107,17 +107,26 @@ class Agent{
     int d_dis;
     int pld_col;
     int pld_row;
+    int pgd_col;
+    int pgd_row;
+
+    int next_area;
 
     double c_1;
     double c_2;
     double w;
     double rand;
 
-    int v_col;
-    int v_row;
+    double v_col;
+    double v_row;
 
-    int x_col;
-    int x_row;
+    double x_col;
+    double x_row;
+
+    int length_move;
+
+    double delta_tau;
+    double sum_pher;
 
     boolean modeChange = false;
 
@@ -127,7 +136,7 @@ class Agent{
         this.col = c;
         this.row = r;
         this.state = "d";
-        this.range = 3;
+        this.range = 2;
         for(int i=0; i<Variable.n; i++){
             for(int j=0; j<Variable.m; j++){
                 PherMatrix[i][j] = 0;
@@ -146,21 +155,27 @@ class Agent{
         this.pld_col = 0;
         this.pld_row = 0;
 
+        this.next_area = -1;
+
         this.c_1 = 1.0;
         this.c_2 = 1.0;
         this.w = 0.6;
         this.rand = 0.0;
 
+        this.delta_tau = 0.0;
+        this.sum_pher = 0.0;
+
         this.v_col = 0;
         this.v_row = 0;
         this.x_col = 0;
         this.x_row = 0;
+        this.length_move = 0;
     }
 
-    void getAreaNo(){
+    int getAreaNo(int row, int col){
         int x = col / Variable.W;
         int y = row / Variable.H;
-        areaNo = x + y * Variable.m;
+        return x + y * Variable.m;
     }
 
     void dispersion(Grid grid){
@@ -172,7 +187,12 @@ class Agent{
         upperEnd = (areaNo / Variable.m) * Variable.H;
         lowerEnd = upperEnd + Variable.H - 1;
 
-        System.out.printf("dispersion mode.\n");
+        //System.out.printf("dispersion mode.\n");
+
+        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 1){
+            //System.out.printf("this agent already reached goal.\n");
+            state.replace("d", "t");
+        }
 
         // count the number of pattern on grid
         for(int i=upperEnd; i<=lowerEnd; i++){
@@ -199,13 +219,9 @@ class Agent{
         if(count == 0){
             state.replace("d", "e");
             grid.vacant[areaNo] = true;
-            System.out.printf("mode changed.\n");
+            //System.out.printf("mode changed to exploration.\n");
         } else if(grid.table[row][col] != 1){
             move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
-            // pheromone update will be written here?
-        } else{
-            grid.occupied[row][col] = 1;
-            System.out.printf("this agent already reached goal.\n");
             // pheromone update will be written here?
         }
     }
@@ -236,28 +252,43 @@ class Agent{
         pld_col = leftEnd + a;
         pld_row = upperEnd + b;
 
-        System.out.printf("pld: (%d, %d)\n", pld_row, pld_col);
+        //System.out.printf("pld: (%d, %d)\n", pld_row, pld_col);
+
+        if(grid.table[pld_row][pld_col] == 1){
+            
+            // CALCULATE SUMMARY OF DELTA_TAU HERE!!!!!
+
+            grid.pherData[pld_row][pld_col] = Variable.alpha * grid.pherData[pld_row][pld_col] + Variable.c * sum_pher;
+            sum_pher = 0;
+        }
         
         // move to the next position
         rand = random.nextDouble();
-        v_col = (int)(w * v_col + c_2 * rand * (pld_col - col));
-        v_row = (int)(w * v_row + c_2 * rand * (pld_row - row));
+        v_col = ((w * v_col + c_2 * rand * (pld_col - col)));
+        v_row = ((w * v_row + c_2 * rand * (pld_row - row)));
         x_col = col + v_col;
         x_row = row + v_row;
 
-        System.out.printf("x: (%d, %d)\n", x_row, x_col);
+        int move_col = (int)(x_col);
+        int move_row = (int)(x_row);
+
+        //System.out.printf("x: (%d, %d)\n", x_row, x_col);
         
         // prevent going over other area
-        if(x_col < leftEnd){
-            x_col = leftEnd;
-        } else{
-            x_col = rightEnd;
+        if(move_col < leftEnd){
+            move_col = leftEnd;
+            x_col = move_col;
+        } else if(move_col > rightEnd){
+            move_col = rightEnd;
+            x_col = move_col;
         }
 
-        if(x_row < upperEnd){
-            x_row = upperEnd;
-        } else{
-            x_row = lowerEnd;
+        if(move_row < upperEnd){
+            move_row = upperEnd;
+            x_row = move_row;
+        } else if(move_row > lowerEnd){
+            move_row = lowerEnd;
+            x_row = move_row;
         }
 
         /*
@@ -294,26 +325,99 @@ class Agent{
 
         */
 
+        //System.out.printf("x2: (%d, %d)\n", x_row, x_col);
+
         grid.deletePos(this);
 
-        col = x_col;
-        row = x_row;
+        length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
+        if(length_move != 0){
+            delta_tau = 1 / length_move;
+        }
+
+        col = move_col;
+        row = move_row;
 
         grid.recordPos(this);
 
         // checking behavior of this function
 
-        System.out.printf("now: (%d, %d)\n", row, col);
+        //System.out.printf("now: (%d, %d)\n", row, col);
 
-        System.out.print(areaNo);
-        System.out.println();
+        //System.out.print(areaNo);
+        //System.out.println();
 
         for(int i=0; i<Variable.H; i++){
             for(int j=0; j<Variable.W; j++){
-                System.out.printf("%f,", disIndicMatrix[i][j]);
+                //System.out.printf("%f,", disIndicMatrix[i][j]);
             }
-            System.out.println();
+            //System.out.println();
         }
+    }
+
+    void exploration(Grid grid){
+        if(next_area == areaNo){
+            state.replace("e", "d");
+            //System.out.printf("mode changed to dispersion.\n");
+        } else {
+            move_exp(grid);
+        }
+    }
+
+    void move_exp(Grid grid){
+        for(int i=0; i<Variable.n; i++){
+            for(int j=0; j<Variable.m; j++){
+               PherMatrix[i][j] = grid.areaPherData[i][j];
+            }
+        }
+
+        for(int i=0; i<Variable.n; i++){
+            for(int j=0; j<Variable.m; j++){
+                d_exp = Math.abs(row - (i*Variable.H - 1 + Variable.H/2 )) + Math.abs(col - (j*Variable.W - 1 + Variable.W/2 ));
+                if(d_exp != 0){
+                    expIndicMatrix[i][j] = Math.exp(0-PherMatrix[i][j]) / d_exp;
+                } else if (grid.vacant[i*Variable.n+j] == true){
+                    expIndicMatrix[i][j] = 0;
+                } else {
+                    expIndicMatrix[i][j] = 0;
+                }
+            }
+        }
+
+        int maxIndex = maxIndex(expIndicMatrix);
+        int a = maxIndex % Variable.W;
+        int b = maxIndex / Variable.W;
+
+        // determine pgd
+        pgd_col = a*Variable.W - 1 + Variable.W/2;
+        pgd_row = b*Variable.H - 1 + Variable.H/2;
+
+        //System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
+
+        next_area = getAreaNo(pgd_row, pgd_col);
+        
+        // move to the next position
+        rand = random.nextDouble();
+        v_col = ((w * v_col + c_2 * rand * (pgd_col - col)));
+        v_row = ((w * v_row + c_2 * rand * (pgd_row - row)));
+        x_col = col + v_col;
+        x_row = row + v_row;
+
+        int move_col = (int)(x_col);
+        int move_row = (int)(x_row);
+
+        //System.out.printf("x: (%d, %d)\n", x_row, x_col);
+
+        grid.deletePos(this);
+
+        length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
+        if(length_move != 0){
+            delta_tau = 1 / length_move;
+        }
+
+        col = move_col;
+        row = move_row;
+
+        grid.recordPos(this);
     }
 
     int maxIndex(double[][] indic){
@@ -361,7 +465,7 @@ public class PF_PSO{
         for (int i=0; i<Variable.AGENT_NUM; i++){
             initial_pos = randomList.get(i);
             agents[i] = new Agent(initial_pos/Variable.M, initial_pos%Variable.M);
-            agents[i].getAreaNo();
+            agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
             grid.recordPos(agents[i]);
             //System.out.printf("(%d, %d)\n", agents[i].row, agents[i].col);
         }
@@ -384,29 +488,48 @@ public class PF_PSO{
             for(int j=0; j<Variable.M; j++){
                 System.out.printf("%d", grid.table[i][j]);
             }
-        System.out.println();
+            System.out.println();
         }
+        System.out.println();
 
+        
+        /*
         if(agents[0].state.equals("d")){
             agents[0].dispersion(grid); 
         }
-
-        /*
-
+        */
+        
+ 
         for(int i=0; i<Variable.maxStep; i++){
             for (int j=0; j<Variable.AGENT_NUM; j++){
-                agents[i].getAreaNo();
+                agents[j].getAreaNo(agents[j].row, agents[j].col);
+
+                if(agents[j].state.equals("t")){
+                    break;
+                }
+                
                 // dispersion mode
-                if(agents[i].state.equals("d")){
-                    
+                if(agents[j].state.equals("d")){
+                    agents[j].dispersion(grid); 
                 }
 
                 // exploration mode
-                if(agents[i].state.equals("e")){
-                    
+                if(agents[j].state.equals("e")){
+                    agents[j].exploration(grid); 
                 }
             }
+            for(int k=0; k<Variable.N; k++){
+                for(int s=0; s<Variable.M; s++){
+                    System.out.print(grid.agent_pos[k][s]);
+                }
+                System.out.println();
+            }
+            System.out.println();   
+
+            if(i == Variable.maxStep - 1){
+                System.out.printf("Reach the final step\n");
+            }
         }
-        */
+        
     }
 }
