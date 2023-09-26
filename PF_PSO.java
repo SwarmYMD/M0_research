@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 class Variable{
     private Variable(){};
@@ -453,6 +456,8 @@ public class PF_PSO{
 
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
+        FileWriter[] fw = new FileWriter[Variable.maxStep];
+
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             randomList.add(i);
         }
@@ -499,36 +504,48 @@ public class PF_PSO{
         }
         */
         
- 
-        for(int i=0; i<Variable.maxStep; i++){
-            for (int j=0; j<Variable.AGENT_NUM; j++){
-                agents[j].getAreaNo(agents[j].row, agents[j].col);
+        try{
+            for(int i=0; i<Variable.maxStep; i++){
+                fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                for (int j=0; j<Variable.AGENT_NUM; j++){
+                    agents[j].getAreaNo(agents[j].row, agents[j].col);
 
-                if(agents[j].state.equals("t")){
-                    break;
-                }
-                
-                // dispersion mode
-                if(agents[j].state.equals("d")){
-                    agents[j].dispersion(grid); 
+                    if(agents[j].state.equals("t")){
+                        break;
+                    }
+                    
+                    // dispersion mode
+                    if(agents[j].state.equals("d")){
+                        agents[j].dispersion(grid); 
+                    }
+
+                    // exploration mode
+                    if(agents[j].state.equals("e")){
+                        agents[j].exploration(grid); 
+                    }
+                    fw[i].append(String.valueOf(agents[j].col));
+                    fw[i].append(",");
+                    fw[i].append(String.valueOf(agents[j].row));
+                    fw[i].append("\n");
                 }
 
-                // exploration mode
-                if(agents[j].state.equals("e")){
-                    agents[j].exploration(grid); 
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        System.out.print(grid.agent_pos[k][s]);
+                    }
+                    System.out.println();
                 }
-            }
-            for(int k=0; k<Variable.N; k++){
-                for(int s=0; s<Variable.M; s++){
-                    System.out.print(grid.agent_pos[k][s]);
-                }
-                System.out.println();
-            }
-            System.out.println();   
+                System.out.println();   
 
-            if(i == Variable.maxStep - 1){
-                System.out.printf("Reach the final step\n");
+                if(i == Variable.maxStep - 1){
+                    System.out.printf("Reach the final step\n");
+                }
+
+                fw[i].close();
+
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         
     }
