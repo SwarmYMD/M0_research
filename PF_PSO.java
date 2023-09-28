@@ -16,7 +16,7 @@ public class PF_PSO{
 
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
-        //FileWriter[] fw = new FileWriter[Variable.maxStep];
+        FileWriter[] fw = new FileWriter[Variable.maxStep];
 
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             randomList.add(i);
@@ -66,13 +66,13 @@ public class PF_PSO{
         
         try{
             for(int i=0; i<Variable.maxStep; i++){
-                //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
                 for (int j=0; j<Variable.AGENT_NUM; j++){
-                    agents[j].getAreaNo(agents[j].row, agents[j].col);
+                    agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
                     calc_sum_pher(agents, agents[j], grid);
 
                     if(agents[j].state.equals("t")){
-                        break;
+                        agents[j].dispersion(grid); 
                     }
                     
                     // dispersion mode
@@ -84,12 +84,12 @@ public class PF_PSO{
                     if(agents[j].state.equals("e")){
                         agents[j].exploration(grid); 
                     }
-                    /*
+                    
                     fw[i].append(String.valueOf(agents[j].col));
                     fw[i].append(",");
                     fw[i].append(String.valueOf(agents[j].row));
                     fw[i].append("\n");
-                    */
+                    
                 }
 
                 finish_agent = 0;
@@ -104,13 +104,15 @@ public class PF_PSO{
                     break;
                 }
 
+                
                 for(int k=0; k<Variable.N; k++){
                     for(int s=0; s<Variable.M; s++){
                         System.out.print(grid.agent_pos[k][s]);
                     }
                     System.out.println();
                 }
-                System.out.println();   
+                System.out.println();
+                
 
                 if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
                     System.out.printf("Reach the final step and FAILURE...\n\n");
@@ -120,7 +122,7 @@ public class PF_PSO{
                     }
                 }
 
-                //fw[i].close();
+                fw[i].close();
 
                 for(int k=0; k<Variable.N; k++){
                     for(int s=0; s<Variable.M; s++){

@@ -102,9 +102,19 @@ public class Agent{
 
         //System.out.printf("dispersion mode.\n");
 
-        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 1){
+        if(grid.table[row][col] == 1){
             //System.out.printf("this agent already reached goal.\n");
-            state.replace("d", "t");
+            state = "t";
+        }
+
+        if(state.equals("t")){
+            int h = areaNo/Variable.m;
+            int w = areaNo%Variable.m;
+            grid.pherData[row][col] = Variable.alpha * grid.pherData[row][col] + Variable.c * sum_pher;
+            grid.areaPherData[h][w] =  Variable.alpha * grid.areaPherData[h][w] + Variable.c * sum_pher;
+            sum_pher = 0;
+            grid.alreadyUpdateDis[row][col] = true;
+            grid.alreadyUpdateExp[h][w] = true;
             return;
         }
 
@@ -131,8 +141,12 @@ public class Agent{
 
         // if all pattern grids are occupied, changing mode(otherwise, continuing dispersion mode)
         if(count == 0){
-            state.replace("d", "e");
+            state = "e";
             grid.vacant[areaNo] = true;
+            v_col = 0;
+            v_row = 0;
+            x_col = 0;
+            x_row = 0;
             //System.out.printf("mode changed to exploration.\n");
         } else if(grid.table[row][col] != 1){
             move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
@@ -278,19 +292,20 @@ public class Agent{
     }
 
     public void exploration(Grid grid){
-        int c = 0;
-        for(int i=0; i<Variable.n * Variable.m; i++){
-            if(grid.vacant[i] == true){
-                c++;
-            }
-            if(c == Variable.n * Variable.m){
-                state.replace("e", "t");
-                return;
-            }
-        }
+        
         if(next_area == areaNo){
-            state.replace("e", "d");
+            state = "d";
+            v_col = 0;
+            v_row = 0;
+            x_col = 0;
+            x_row = 0;
             //System.out.printf("mode changed to dispersion.\n");
+        } else if(grid.vacant[areaNo] = false) {
+            state = "d";
+            v_col = 0;
+            v_row = 0;
+            x_col = 0;
+            x_row = 0;
         } else {
             move_exp(grid);
         }
@@ -327,7 +342,11 @@ public class Agent{
         pgd_col = a*Variable.W - 1 + Variable.W/2;
         pgd_row = b*Variable.H - 1 + Variable.H/2;
 
-        //System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
+        
+        System.out.printf("now: (%d, %d)\n", row, col);
+        System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
+        System.out.printf("areaNo: %d\n", areaNo);
+        System.out.println();
 
         next_area = getAreaNo(pgd_row, pgd_col);
         
@@ -341,6 +360,22 @@ public class Agent{
         int move_col = (int)(x_col);
         int move_row = (int)(x_row);
 
+        if(move_col < 0){
+            move_col = 0;
+            x_col = move_col;
+        } else if(move_col > Variable.M-1){
+            move_col = Variable.M-1;
+            x_col = move_col;
+        }
+
+        if(move_row < 0){
+            move_row = 0;
+            x_row = move_row;
+        } else if(move_row > Variable.N-1){
+            move_row = Variable.N-1;
+            x_row = move_row;
+        }
+
         //System.out.printf("x: (%d, %d)\n", x_row, x_col);
 
         grid.deletePos(this);
@@ -349,6 +384,9 @@ public class Agent{
 
         col = move_col;
         row = move_row;
+
+        System.out.printf("now: (%d, %d)\n", row, col);
+        System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
 
         grid.recordPos(this);
     }
