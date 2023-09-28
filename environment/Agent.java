@@ -2,6 +2,8 @@ package environment;
 
 import java.util.*;
 
+import environment.Variable;
+
 public class Agent{
     public int col;
     public int row;
@@ -36,8 +38,8 @@ public class Agent{
 
     int length_move;
 
-    double delta_tau;
-    double sum_pher;
+    public double delta_tau;
+    public double sum_pher;
 
     boolean modeChange = false;
 
@@ -47,7 +49,7 @@ public class Agent{
         this.col = c;
         this.row = r;
         this.state = "d";
-        this.range = 2;
+        this.range = 3;
         for(int i=0; i<Variable.n; i++){
             for(int j=0; j<Variable.m; j++){
                 PherMatrix[i][j] = 0;
@@ -103,6 +105,7 @@ public class Agent{
         if(grid.table[row][col] == 1 && grid.occupied[row][col] == 1){
             //System.out.printf("this agent already reached goal.\n");
             state.replace("d", "t");
+            return;
         }
 
         // count the number of pattern on grid
@@ -135,6 +138,10 @@ public class Agent{
             move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
             // pheromone update will be written here?
         }
+
+        if(length_move != 0){
+            delta_tau = Variable.Q / length_move;
+        }
     }
 
     public void move_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd){
@@ -144,6 +151,7 @@ public class Agent{
                 subPherMatrix[i-upperEnd][j-leftEnd] = grid.pherData[i][j];
             }
         }
+        
         for(int i=0; i<Variable.H; i++){
             for(int j=0; j<Variable.W; j++){
                 d_dis = Math.abs(row - i - upperEnd) + Math.abs(col - j - leftEnd);
@@ -165,12 +173,15 @@ public class Agent{
 
         //System.out.printf("pld: (%d, %d)\n", pld_row, pld_col);
 
+        // pheromone update (calc of sum_pher is written in PF_PSO.java)
         if(grid.table[pld_row][pld_col] == 1){
-            
-            // CALCULATE SUMMARY OF DELTA_TAU HERE!!!!!
-
+            int h = areaNo/Variable.m;
+            int w = areaNo%Variable.m;
             grid.pherData[pld_row][pld_col] = Variable.alpha * grid.pherData[pld_row][pld_col] + Variable.c * sum_pher;
+            grid.areaPherData[h][w] =  Variable.alpha * grid.areaPherData[h][w] + Variable.c * sum_pher;
             sum_pher = 0;
+            grid.alreadyUpdateDis[pld_row][pld_col] = true;
+            grid.alreadyUpdateExp[h][w] = true;
         }
         
         // move to the next position
@@ -241,12 +252,13 @@ public class Agent{
         grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
-        if(length_move != 0){
-            delta_tau = 1 / length_move;
-        }
 
         col = move_col;
         row = move_row;
+
+        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+            grid.occupied[row][col] = 1;
+        }
 
         grid.recordPos(this);
 
@@ -266,11 +278,24 @@ public class Agent{
     }
 
     public void exploration(Grid grid){
+        int c = 0;
+        for(int i=0; i<Variable.n * Variable.m; i++){
+            if(grid.vacant[i] == true){
+                c++;
+            }
+            if(c == Variable.n * Variable.m){
+                state.replace("e", "t");
+                return;
+            }
+        }
         if(next_area == areaNo){
             state.replace("e", "d");
             //System.out.printf("mode changed to dispersion.\n");
         } else {
             move_exp(grid);
+        }
+        if(length_move != 0){
+            delta_tau = Variable.Q / length_move;
         }
     }
 
@@ -321,9 +346,6 @@ public class Agent{
         grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
-        if(length_move != 0){
-            delta_tau = 1 / length_move;
-        }
 
         col = move_col;
         row = move_row;

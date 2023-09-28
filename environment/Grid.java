@@ -34,6 +34,8 @@ public class Grid{
     public double[][] pherData = new double[Variable.N][Variable.M];
     public double[][] areaPherData = new double[Variable.n][Variable.m];
     public boolean[] vacant = new boolean[Variable.n * Variable.m];
+    public boolean[][] alreadyUpdateDis = new boolean[Variable.N][Variable.M];
+    public boolean[][] alreadyUpdateExp = new boolean[Variable.n][Variable.m];
 
     public Grid(){
         this.h = grid.length;
@@ -52,12 +54,14 @@ public class Grid{
         for(int i=0; i<Variable.N; i++){
             for(int j=0; j<Variable.M; j++){
                 pherData[i][j] = 0;
+                alreadyUpdateDis[i][j] = false;
                 // pherData[i][j] = i * Variable.M + j;
             }
         }
         for(int i=0; i<Variable.n; i++){
             for(int j=0; j<Variable.m; j++){
                 areaPherData[i][j] = 0;
+                alreadyUpdateExp[i][j] = false;
             }
         }
         Arrays.fill(vacant, false);
