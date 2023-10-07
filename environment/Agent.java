@@ -115,6 +115,9 @@ public class Agent{
             sum_pher = 0;
             grid.alreadyUpdateDis[row][col] = true;
             grid.alreadyUpdateExp[h][w] = true;
+            if(grid.agent_pos[row][col] == 1){
+                grid.recordPos(this);
+            }
             return;
         }
 
@@ -335,12 +338,12 @@ public class Agent{
         }
 
         int maxIndex = maxIndex(expIndicMatrix);
-        int a = maxIndex % Variable.W;
-        int b = maxIndex / Variable.W;
+        int a = maxIndex % Variable.m;
+        int b = maxIndex / Variable.m;
 
         // determine pgd
-        pgd_col = a*Variable.W - 1 + Variable.W/2;
-        pgd_row = b*Variable.H - 1 + Variable.H/2;
+        pgd_col = a*Variable.W + Variable.W/2;
+        pgd_row = b*Variable.H + Variable.H/2;
 
         
         System.out.printf("now: (%d, %d)\n", row, col);
