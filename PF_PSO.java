@@ -49,6 +49,7 @@ public class PF_PSO{
 
         System.out.println();
 
+        /*
         for(int i=0; i<Variable.N; i++){
             for(int j=0; j<Variable.M; j++){
                 System.out.printf("%d", grid.table[i][j]);
@@ -56,7 +57,7 @@ public class PF_PSO{
             System.out.println();
         }
         System.out.println();
-
+        */
         
         /*
         if(agents[0].state.equals("d")){
@@ -65,24 +66,27 @@ public class PF_PSO{
         */
         
         try{
-            //for(int i=0; i<Variable.maxStep; i++){
-            for(int i=0; ; i++){
+            for(int i=0; i<Variable.maxStep; i++){
+            //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        grid.agent_pos[k][s] = 0;
+                    }
+                }
+                
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
                     calc_sum_pher(agents, agents[j], grid);
 
                     if(agents[j].state.equals("t")){
                         agents[j].dispersion(grid); 
-                    }
-                    
+                    }else if(agents[j].state.equals("d")){
                     // dispersion mode
-                    if(agents[j].state.equals("d")){
                         agents[j].dispersion(grid); 
-                    }
-
+                        //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
+                    }else if(agents[j].state.equals("e")){
                     // exploration mode
-                    if(agents[j].state.equals("e")){
                         agents[j].exploration(grid); 
                     }
                     
@@ -101,6 +105,18 @@ public class PF_PSO{
                     }
                 }
 
+                /*
+                if(agents[0].state.equals(("d"))){
+                    for(int k=0; k<Variable.H; k++){
+                        for(int s=0; s<Variable.W; s++){
+                            System.out.printf("%f,", agents[0].subPherMatrix[k][s]);
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                }
+                */
+
                 if(finish_agent == Variable.AGENT_NUM){
                     System.out.printf("PF completes.\n");
                     System.out.printf("total steps: %d\n", i+1);
@@ -108,6 +124,11 @@ public class PF_PSO{
                         System.out.print(agents[j].state);
                     }
                     System.out.printf("\n");
+
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        grid.recordPos(agents[j]);
+                    }
+
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
                             System.out.print(grid.agent_pos[k][s]);
@@ -124,7 +145,12 @@ public class PF_PSO{
                     break;
                 }
 
-                if((i+1)%10 == 0){
+                for (int j=0; j<Variable.AGENT_NUM; j++){
+                    grid.recordPos(agents[j]);
+                }
+
+                
+                if((i+1)%100 == 0){
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
                             System.out.print(grid.agent_pos[k][s]);
@@ -132,8 +158,36 @@ public class PF_PSO{
                         System.out.println();
                     }
                     System.out.println();
+
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        System.out.print(agents[j].state);
+                    }
+
+                    System.out.println();
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        if(agents[j].state.equals("d")) {
+                            //System.out.printf("agent[%d]'s x: (%.1f, %.1f) ", j, agents[j].x_row, agents[j].x_col);
+                            //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
+                        }
+                    }
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        if(agents[j].state.equals("e")) {
+                            for(int k=0; k<Variable.n; k++){
+                                for(int s=0; s<Variable.m; s++){
+                                    System.out.print(agents[j].expIndicMatrix[k][s]);
+                                }
+                                System.out.println();
+                            }
+                        }
+                    }
                 }
-                
+
+                /*
+                for (int j=0; j<Variable.AGENT_NUM; j++){
+                    System.out.print(agents[j].state);
+                }
+                System.out.println();
+                */
 
                 /*
                 if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
@@ -151,6 +205,9 @@ public class PF_PSO{
                     for(int s=0; s<Variable.M; s++){
                         if(grid.alreadyUpdateDis[k][s] == false){
                             grid.pherData[k][s] = Variable.alpha * grid.pherData[k][s];
+                            if(grid.pherData[k][s] > Variable.max_tau){
+                                grid.pherData[k][s] = Variable.max_tau;
+                            }
                         }else{
                             grid.alreadyUpdateDis[k][s] = false;
                         }
@@ -161,6 +218,9 @@ public class PF_PSO{
                     for(int s=0; s<Variable.m; s++){
                         if(grid.alreadyUpdateExp[k][s] == false){
                             grid.areaPherData[k][s] = Variable.alpha * grid.areaPherData[k][s];
+                            if(grid.areaPherData[k][s] > Variable.max_tau){
+                                grid.areaPherData[k][s] = Variable.max_tau;
+                            }
                         }else{
                             grid.alreadyUpdateExp[k][s] = false;
                         }

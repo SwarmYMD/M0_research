@@ -38,6 +38,8 @@ public class Agent{
 
     int length_move;
 
+    int count;
+
     public double delta_tau;
     public double sum_pher;
 
@@ -83,6 +85,8 @@ public class Agent{
         this.x_col = 0;
         this.x_row = 0;
         this.length_move = 0;
+
+        this.count = 0;
     }
 
     public int getAreaNo(int row, int col){
@@ -92,7 +96,6 @@ public class Agent{
     }
 
     public void dispersion(Grid grid){
-        int count = 0;
         int leftEnd, rightEnd;
         int upperEnd, lowerEnd;
         leftEnd = (areaNo % Variable.m) * Variable.W;
@@ -111,7 +114,13 @@ public class Agent{
             int h = areaNo/Variable.m;
             int w = areaNo%Variable.m;
             grid.pherData[row][col] = Variable.alpha * grid.pherData[row][col] + Variable.c * sum_pher;
+            if(grid.pherData[row][col] > Variable.max_tau){
+                grid.pherData[row][col] = Variable.max_tau;
+            }
             grid.areaPherData[h][w] =  Variable.alpha * grid.areaPherData[h][w] + Variable.c * sum_pher;
+            if(grid.areaPherData[h][w] > Variable.max_tau){
+                grid.areaPherData[h][w] = Variable.max_tau;
+            }
             sum_pher = 0;
             grid.alreadyUpdateDis[row][col] = true;
             grid.alreadyUpdateExp[h][w] = true;
@@ -159,6 +168,7 @@ public class Agent{
         if(length_move != 0){
             delta_tau = Variable.Q / length_move;
         }
+        count = 0;
     }
 
     public void move_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd){
@@ -195,7 +205,13 @@ public class Agent{
             int h = areaNo/Variable.m;
             int w = areaNo%Variable.m;
             grid.pherData[pld_row][pld_col] = Variable.alpha * grid.pherData[pld_row][pld_col] + Variable.c * sum_pher;
+            if(grid.pherData[pld_row][pld_col] > Variable.max_tau){
+                grid.pherData[pld_row][pld_col] = Variable.max_tau;
+            }
             grid.areaPherData[h][w] =  Variable.alpha * grid.areaPherData[h][w] + Variable.c * sum_pher;
+            if(grid.areaPherData[h][w] > Variable.max_tau){
+                grid.areaPherData[h][w] = Variable.max_tau;
+            }
             sum_pher = 0;
             grid.alreadyUpdateDis[pld_row][pld_col] = true;
             grid.alreadyUpdateExp[h][w] = true;
@@ -266,7 +282,7 @@ public class Agent{
 
         //System.out.printf("x2: (%d, %d)\n", x_row, x_col);
 
-        grid.deletePos(this);
+        //grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
 
@@ -277,7 +293,7 @@ public class Agent{
             grid.occupied[row][col] = 1;
         }
 
-        grid.recordPos(this);
+        //grid.recordPos(this);
 
         // checking behavior of this function
 
@@ -292,29 +308,104 @@ public class Agent{
             }
             //System.out.println();
         }
+        /*
+        System.out.printf("x: (%.1f, %.1f), ", x_row, x_col);
+        System.out.printf("areaNo: %d, ", areaNo);
+        System.out.printf("left, right: (%d, %d)\n", leftEnd, rightEnd);
+        */
     }
 
     public void exploration(Grid grid){
+        int leftEnd, rightEnd;
+        int upperEnd, lowerEnd;
+        leftEnd = (areaNo % Variable.m) * Variable.W;
+        rightEnd = leftEnd + Variable.W - 1;
+        upperEnd = (areaNo / Variable.m) * Variable.H;
+        lowerEnd = upperEnd + Variable.H - 1;
+
+        // count the number of pattern on grid
+        for(int i=upperEnd; i<=lowerEnd; i++){
+            for(int j=leftEnd; j<=rightEnd; j++){
+                if(grid.table[i][j] == 1){
+                    count++;
+                }
+            }
+        }
+
+        // check the number of occupied grids
+        for(int i=upperEnd; i<=lowerEnd; i++){
+            for(int j=leftEnd; j<=rightEnd; j++){
+                if(grid.table[i][j] == 1){
+                    if(grid.occupied[i][j] == 1){
+                        count--;
+                        //move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
+                    }
+                }
+            }
+        }
+
+        if(count == 0){
+            grid.vacant[areaNo] = true;
+        }
         
-        if(next_area == areaNo){
-            state = "d";
-            v_col = 0;
-            v_row = 0;
-            x_col = 0;
-            x_row = 0;
+        if(areaNo == next_area){
+            if(grid.vacant[areaNo] == false){
+                state = "d";
+                v_col = 0;
+                v_row = 0;
+                x_col = 0;
+                x_row = 0;
+            } else {
+                move_exp(grid);
+            }
             //System.out.printf("mode changed to dispersion.\n");
-        } else if(grid.vacant[areaNo] = false) {
+        } else if(grid.vacant[areaNo] == false) {
             state = "d";
             v_col = 0;
             v_row = 0;
             x_col = 0;
             x_row = 0;
+        } else if(next_area != -1){
+            rand = random.nextDouble();
+            v_col = ((w * v_col + c_2 * rand * (pgd_col - col)));
+            v_row = ((w * v_row + c_2 * rand * (pgd_row - row)));
+            x_col = col + v_col;
+            x_row = row + v_row;
+
+            int move_col = (int)(x_col);
+            int move_row = (int)(x_row);
+
+            if(move_col < 0){
+                move_col = 0;
+                x_col = move_col;
+            } else if(move_col > Variable.M-1){
+                move_col = Variable.M-1;
+                x_col = move_col;
+            }
+
+            if(move_row < 0){
+                move_row = 0;
+                x_row = move_row;
+            } else if(move_row > Variable.N-1){
+                move_row = Variable.N-1;
+                x_row = move_row;
+            }
+
+            //System.out.printf("x: (%d, %d)\n", x_row, x_col);
+
+            //grid.deletePos(this);
+
+            length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
+
+            col = move_col;
+            row = move_row;
         } else {
             move_exp(grid);
         }
         if(length_move != 0){
             delta_tau = Variable.Q / length_move;
         }
+        count = 0;
     }
 
     public void move_exp(Grid grid){
@@ -326,11 +417,11 @@ public class Agent{
 
         for(int i=0; i<Variable.n; i++){
             for(int j=0; j<Variable.m; j++){
-                d_exp = Math.abs(row - (i*Variable.H - 1 + Variable.H/2 )) + Math.abs(col - (j*Variable.W - 1 + Variable.W/2 ));
-                if(d_exp != 0){
+                d_exp = Math.abs(row - (i*Variable.H + Variable.H/2 )) + Math.abs(col - (j*Variable.W + Variable.W/2 ));
+                if (grid.vacant[i*Variable.m+j] == true){
+                    expIndicMatrix[i][j] = -1;
+                } else if(d_exp != 0){
                     expIndicMatrix[i][j] = Math.exp(0-PherMatrix[i][j]) / d_exp;
-                } else if (grid.vacant[i*Variable.n+j] == true){
-                    expIndicMatrix[i][j] = 0;
                 } else {
                     expIndicMatrix[i][j] = 0;
                 }
@@ -346,10 +437,10 @@ public class Agent{
         pgd_row = b*Variable.H + Variable.H/2;
 
         
-        System.out.printf("now: (%d, %d)\n", row, col);
-        System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
-        System.out.printf("areaNo: %d\n", areaNo);
-        System.out.println();
+        //System.out.printf("now: (%d, %d)\n", row, col);
+        //System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
+        //System.out.printf("areaNo: %d\n", areaNo);
+        //System.out.println();
 
         next_area = getAreaNo(pgd_row, pgd_col);
         
@@ -381,17 +472,17 @@ public class Agent{
 
         //System.out.printf("x: (%d, %d)\n", x_row, x_col);
 
-        grid.deletePos(this);
+        //grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
 
         col = move_col;
         row = move_row;
 
-        System.out.printf("now: (%d, %d)\n", row, col);
-        System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
+        //System.out.printf("now: (%d, %d)\n", row, col);
+        //System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
 
-        grid.recordPos(this);
+        //grid.recordPos(this);
     }
 
     public int maxIndex(double[][] indic){
