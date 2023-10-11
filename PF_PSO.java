@@ -13,10 +13,11 @@ public class PF_PSO{
 
         int initial_pos;
         int finish_agent = 0;
+        boolean half_flag = false;
 
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
-        //FileWriter[] fw = new FileWriter[Variable.maxStep];
+        FileWriter[] fw = new FileWriter[Variable.maxStep];
 
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             randomList.add(i);
@@ -66,6 +67,14 @@ public class PF_PSO{
         */
         
         try{
+            FileWriter f = new FileWriter("./csv/step0.csv");
+            for (int j=0; j<Variable.AGENT_NUM; j++){
+                f.append(String.valueOf(agents[j].col));
+                f.append(",");
+                f.append(String.valueOf(agents[j].row));
+                f.append("\n");
+            }
+            f.close();
             for(int i=0; i<Variable.maxStep; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
@@ -116,6 +125,27 @@ public class PF_PSO{
                     System.out.println();
                 }
                 */
+                
+                if(finish_agent >= Variable.AGENT_NUM / 2){
+                    if(half_flag == false){
+                        System.out.printf("PF 50 percent achieved.\n");
+                        System.out.printf("50 percent steps: %d\n", i+1);
+                        for (int j=0; j<Variable.AGENT_NUM; j++){
+                            System.out.print(agents[j].state);
+                        }
+                        System.out.printf("\n");
+
+                        fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                        for (int j=0; j<Variable.AGENT_NUM; j++){
+                            fw[i].append(String.valueOf(agents[j].col));
+                            fw[i].append(",");
+                            fw[i].append(String.valueOf(agents[j].row));
+                            fw[i].append("\n");
+                        }
+                        fw[i].close();
+                    }
+                    half_flag = true;
+                }
 
                 if(finish_agent == Variable.AGENT_NUM){
                     System.out.printf("PF completes.\n");
@@ -142,6 +172,15 @@ public class PF_PSO{
                             System.out.printf("Strange pos: (%d, %d)\n", agents[j].row, agents[j].col);
                         }
                     }
+                    
+                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        fw[i].append(String.valueOf(agents[j].col));
+                        fw[i].append(",");
+                        fw[i].append(String.valueOf(agents[j].row));
+                        fw[i].append("\n");
+                    }
+                    fw[i].close();
                     break;
                 }
 
@@ -149,7 +188,7 @@ public class PF_PSO{
                     grid.recordPos(agents[j]);
                 }
 
-                
+                /*
                 if((i+1)%100 == 0){
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
@@ -181,6 +220,7 @@ public class PF_PSO{
                         }
                     }
                 }
+                */
 
                 /*
                 for (int j=0; j<Variable.AGENT_NUM; j++){
