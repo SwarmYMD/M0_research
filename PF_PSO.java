@@ -76,6 +76,7 @@ public class PF_PSO{
             }
             f.close();
             for(int i=0; i<Variable.maxStep; i++){
+            //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
                 for(int k=0; k<Variable.N; k++){
@@ -189,7 +190,9 @@ public class PF_PSO{
                 }
 
                 /*
-                if((i+1)%100 == 0){
+                //if((i+1)%100 == 0){
+                if(i>9995 && ((i+1) != Variable.maxStep)){
+                    
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
                             System.out.print(grid.agent_pos[k][s]);
@@ -203,10 +206,11 @@ public class PF_PSO{
                     }
 
                     System.out.println();
+                    
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         if(agents[j].state.equals("d")) {
                             //System.out.printf("agent[%d]'s x: (%.1f, %.1f) ", j, agents[j].x_row, agents[j].x_col);
-                            //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
+                            System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
                         }
                     }
                     for (int j=0; j<Variable.AGENT_NUM; j++){
@@ -236,6 +240,15 @@ public class PF_PSO{
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         System.out.print(agents[j].state);
                     }
+
+                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        fw[i].append(String.valueOf(agents[j].col));
+                        fw[i].append(",");
+                        fw[i].append(String.valueOf(agents[j].row));
+                        fw[i].append("\n");
+                    }
+                    fw[i].close();
                 }
                 */
 

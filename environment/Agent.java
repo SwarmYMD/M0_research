@@ -116,10 +116,14 @@ public class Agent{
             grid.pherData[row][col] = Variable.alpha * grid.pherData[row][col] + Variable.c * sum_pher;
             if(grid.pherData[row][col] > Variable.max_tau){
                 grid.pherData[row][col] = Variable.max_tau;
+            //} else if (grid.pherData[row][col] < 100){
+                //grid.pherData[row][col] = 100;
             }
             grid.areaPherData[h][w] =  Variable.alpha * grid.areaPherData[h][w] + Variable.c * sum_pher;
             if(grid.areaPherData[h][w] > Variable.max_tau){
                 grid.areaPherData[h][w] = Variable.max_tau;
+            //} else if (grid.areaPherData[h][w] < 100){
+                //grid.areaPherData[h][w] = 100;
             }
             sum_pher = 0;
             grid.alreadyUpdateDis[row][col] = true;
@@ -207,10 +211,14 @@ public class Agent{
             grid.pherData[pld_row][pld_col] = Variable.alpha * grid.pherData[pld_row][pld_col] + Variable.c * sum_pher;
             if(grid.pherData[pld_row][pld_col] > Variable.max_tau){
                 grid.pherData[pld_row][pld_col] = Variable.max_tau;
+            //} else if (grid.pherData[pld_row][pld_col] < 100){
+                //grid.pherData[pld_row][pld_col] = 100;
             }
             grid.areaPherData[h][w] =  Variable.alpha * grid.areaPherData[h][w] + Variable.c * sum_pher;
             if(grid.areaPherData[h][w] > Variable.max_tau){
                 grid.areaPherData[h][w] = Variable.max_tau;
+            //} else if (grid.areaPherData[h][w] < 100){
+                //grid.areaPherData[h][w] = 100;
             }
             sum_pher = 0;
             grid.alreadyUpdateDis[pld_row][pld_col] = true;
