@@ -90,14 +90,14 @@ public class PF_PSO{
                     calc_sum_pher(agents, agents[j], grid);
 
                     if(agents[j].state.equals("t")){
-                        agents[j].dispersion(grid); 
+                        agents[j].dispersion(grid, agents); 
                     }else if(agents[j].state.equals("d")){
                     // dispersion mode
-                        agents[j].dispersion(grid); 
+                        agents[j].dispersion(grid, agents); 
                         //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
                     }else if(agents[j].state.equals("e")){
                     // exploration mode
-                        agents[j].exploration(grid); 
+                        agents[j].exploration(grid, agents); 
                     }
                     
                     /*
@@ -233,7 +233,7 @@ public class PF_PSO{
                 System.out.println();
                 */
 
-                /*
+                
                 if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
                     System.out.printf("Reach the final step and FAILURE...\n\n");
 
@@ -250,7 +250,7 @@ public class PF_PSO{
                     }
                     fw[i].close();
                 }
-                */
+                
 
                 //fw[i].close();
 
