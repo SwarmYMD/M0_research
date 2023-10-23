@@ -1,6 +1,7 @@
 import environment.Variable;
 import environment.Grid;
 import environment.Agent;
+//import environment.AgentDup;
 
 import java.util.*;
 
@@ -28,8 +29,10 @@ public class PF_PSO{
 
         // Initial setting of agents.
         Agent[] agents = new Agent[Variable.AGENT_NUM];
+        //AgentDup[] agents = new AgentDup[Variable.AGENT_NUM];
         for (int i=0; i<Variable.AGENT_NUM; i++){
             initial_pos = randomList.get(i);
+            //agents[i] = new AgentDup(initial_pos/Variable.M, initial_pos%Variable.M);
             agents[i] = new Agent(initial_pos/Variable.M, initial_pos%Variable.M);
             agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
             grid.recordPos(agents[i]);
@@ -62,7 +65,7 @@ public class PF_PSO{
         
         /*
         if(agents[0].state.equals("d")){
-            agents[0].dispersion(grid); 
+            agents[0].dispersion(grid, agents); 
         }
         */
         
@@ -75,29 +78,31 @@ public class PF_PSO{
                 f.append("\n");
             }
             f.close();
-            for(int i=0; i<Variable.maxStep; i++){
-            //for(int i=0; ; i++){
+            //for(int i=0; i<Variable.maxStep; i++){
+            for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                /*
                 for(int k=0; k<Variable.N; k++){
                     for(int s=0; s<Variable.M; s++){
                         grid.agent_pos[k][s] = 0;
                     }
                 }
+                */
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
                     calc_sum_pher(agents, agents[j], grid);
 
                     if(agents[j].state.equals("t")){
-                        agents[j].dispersion(grid); 
+                        agents[j].dispersion(grid, agents); 
                     }else if(agents[j].state.equals("d")){
                     // dispersion mode
-                        agents[j].dispersion(grid); 
+                        agents[j].dispersion(grid, agents); 
                         //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
                     }else if(agents[j].state.equals("e")){
                     // exploration mode
-                        agents[j].exploration(grid); 
+                        agents[j].exploration(grid, agents); 
                     }
                     
                     /*
@@ -156,9 +161,11 @@ public class PF_PSO{
                     }
                     System.out.printf("\n");
 
+                    /*
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         grid.recordPos(agents[j]);
                     }
+                    */
 
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
@@ -185,9 +192,11 @@ public class PF_PSO{
                     break;
                 }
 
+                /*
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     grid.recordPos(agents[j]);
                 }
+                */
 
                 /*
                 //if((i+1)%100 == 0){
@@ -233,7 +242,7 @@ public class PF_PSO{
                 System.out.println();
                 */
 
-                /*
+                
                 if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
                     System.out.printf("Reach the final step and FAILURE...\n\n");
 
@@ -250,7 +259,7 @@ public class PF_PSO{
                     }
                     fw[i].close();
                 }
-                */
+                
 
                 //fw[i].close();
 
@@ -287,6 +296,7 @@ public class PF_PSO{
         
     }
 
+    //public static void calc_sum_pher(AgentDup[] agents, AgentDup r, Grid grid) {
     public static void calc_sum_pher(Agent[] agents, Agent r, Grid grid) {
         r.sum_pher = 0;
     

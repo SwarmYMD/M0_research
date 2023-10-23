@@ -95,9 +95,12 @@ public class Agent{
         return x + y * Variable.m;
     }
 
-    public void dispersion(Grid grid){
+    public void dispersion(Grid grid, Agent[] agents){
         int leftEnd, rightEnd;
         int upperEnd, lowerEnd;
+        int not_move_count = 0;
+        int pre_r = row;
+        int pre_c = col;
         leftEnd = (areaNo % Variable.m) * Variable.W;
         rightEnd = leftEnd + Variable.W - 1;
         upperEnd = (areaNo / Variable.m) * Variable.H;
@@ -113,6 +116,43 @@ public class Agent{
         if(state.equals("t")){
             int h = areaNo/Variable.m;
             int w = areaNo%Variable.m;
+            ArrayList<Integer> candiList = new ArrayList<Integer>();
+
+            if(pre_c == col && pre_r == row){
+                not_move_count++;
+            } else {
+                not_move_count = 0;
+            }
+
+            if(not_move_count >= 20){
+                for(int j = 0; j < 4; j++){
+                    int r = row + Variable.dir_row[j];
+                    int c = col + Variable.dir_col[j];
+                    if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
+                        if(grid.agent_pos[r][c] != 1 && grid.table[r][c] == 1){
+                            candiList.add(r*Variable.M+c);
+                        }
+                    }
+                }
+                if(candiList.size() != 0){
+                    Collections.shuffle(candiList);
+                    int change_pos = candiList.get(0);
+                    int a = change_pos % Variable.M;
+                    int b = change_pos / Variable.M;
+                    grid.agent_pos[row][col] = 0;
+                    grid.occupied[row][col] = 0;
+                    length_move = length_move + 1;
+                    col = a;
+                    row = b;
+                    grid.agent_pos[b][a] = 1;
+
+                    if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
+                        grid.occupied[b][a] = 1;
+                    }
+
+                }
+            }
+
             grid.pherData[row][col] = Variable.alpha * grid.pherData[row][col] + Variable.c * sum_pher;
             if(grid.pherData[row][col] > Variable.max_tau){
                 grid.pherData[row][col] = Variable.max_tau;
@@ -149,7 +189,7 @@ public class Agent{
                 if(grid.table[i][j] == 1){
                     if(grid.occupied[i][j] == 1){
                         count--;
-                        //move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
+                        //move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd, agents);
                     }
                 }
             }
@@ -165,7 +205,7 @@ public class Agent{
             x_row = 0;
             //System.out.printf("mode changed to exploration.\n");
         } else if(grid.table[row][col] != 1){
-            move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
+            move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd, agents);
             // pheromone update will be written here?
         }
 
@@ -175,7 +215,7 @@ public class Agent{
         count = 0;
     }
 
-    public void move_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd){
+    public void move_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent[] agents){
         // copy pheromone data of the area which this agent exists
         for(int i=upperEnd; i<=lowerEnd; i++){
             for(int j=leftEnd; j<=rightEnd; j++){
@@ -289,8 +329,9 @@ public class Agent{
         */
 
         //System.out.printf("x2: (%d, %d)\n", x_row, x_col);
+        /*
 
-        //grid.deletePos(this);
+        grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
 
@@ -300,6 +341,99 @@ public class Agent{
         if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
             grid.occupied[row][col] = 1;
         }
+
+        grid.recordPos(this);
+        */
+
+        check_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd, agents, move_row, move_col);
+    }
+
+    public void check_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent[] agents, int mr, int mc){
+        ArrayList<Integer> candiList = new ArrayList<Integer>();
+        int change_pos;
+        for(int i = 0; i < Variable.AGENT_NUM; i++){
+            if(this != agents[i]){
+            //System.out.printf("agents[%d] pos: (%d, %d)\n", i, agents[i].row, agents[i].col);
+                if(mr == agents[i].row && mc == agents[i].col){
+                    for(int j = 0; j < 4; j++){
+                        int r = agents[i].row + Variable.dir_row[j];
+                        int c = agents[i].col + Variable.dir_col[j];
+                        if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
+                            if(grid.agent_pos[r][c] != 1){
+                                if(grid.table[agents[i].row][agents[i].col] == 1 && grid.table[r][c] == 1){
+                                    candiList.add(r*Variable.M+c);
+                                }
+                            }
+                        }
+                    }
+                    if(candiList.size() != 0){
+                        Collections.shuffle(candiList);
+                        change_pos = candiList.get(0);
+                        int a = change_pos % Variable.M;
+                        int b = change_pos / Variable.M;
+                        grid.agent_pos[agents[i].row][agents[i].col] = 0;
+                        grid.occupied[agents[i].row][agents[i].col] = 0;
+                        agents[i].length_move = agents[i].length_move + 1;
+                        agents[i].col = a;
+                        agents[i].row = b;
+                        grid.agent_pos[b][a] = 1;
+
+                        if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
+                            grid.occupied[b][a] = 1;
+                        }
+
+                        length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+
+                        grid.deletePos(this);
+                        col = mc;
+                        row = mr;
+
+                        
+                        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                            grid.occupied[row][col] = 1;
+                        }
+                        grid.recordPos(this);
+
+                    }else if(grid.table[agents[i].row][agents[i].col] == 0){
+                        for(int j = 0; j < 4; j++){
+                            int r = agents[i].row + Variable.dir_row[j];
+                            int c = agents[i].col + Variable.dir_col[j];
+                            if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
+                                if(grid.agent_pos[r][c] != 1){
+                                    candiList.add(r*Variable.M+c);
+                                }
+                            }
+                        }
+                        grid.deletePos(this);
+                        col = mc;
+                        row = mr;
+
+                        
+                        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                            grid.occupied[row][col] = 1;
+                        }
+                        grid.recordPos(this);
+                    }
+                }
+            }
+        }
+
+        candiList.clear();
+        
+        /*
+        //grid.deletePos(this);
+
+        length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
+
+        col = move_col;
+        row = move_row;
+
+        
+        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+            grid.occupied[row][col] = 1;
+        }
+        */
+        
 
         //grid.recordPos(this);
 
@@ -323,7 +457,7 @@ public class Agent{
         */
     }
 
-    public void exploration(Grid grid){
+    public void exploration(Grid grid, Agent[] agents){
         int leftEnd, rightEnd;
         int upperEnd, lowerEnd;
         leftEnd = (areaNo % Variable.m) * Variable.W;
@@ -346,7 +480,7 @@ public class Agent{
                 if(grid.table[i][j] == 1){
                     if(grid.occupied[i][j] == 1){
                         count--;
-                        //move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd);
+                        //move_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd, agents);
                     }
                 }
             }
@@ -364,7 +498,7 @@ public class Agent{
                 x_col = 0;
                 x_row = 0;
             } else {
-                move_exp(grid);
+                move_exp(grid, agents);
             }
             //System.out.printf("mode changed to dispersion.\n");
         } else if(grid.vacant[areaNo] == false) {
@@ -401,14 +535,16 @@ public class Agent{
 
             //System.out.printf("x: (%d, %d)\n", x_row, x_col);
 
-            //grid.deletePos(this);
+            grid.deletePos(this);
 
             length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
 
             col = move_col;
             row = move_row;
+
+            grid.recordPos(this);
         } else {
-            move_exp(grid);
+            move_exp(grid, agents);
         }
         if(length_move != 0){
             delta_tau = Variable.Q / length_move;
@@ -416,7 +552,7 @@ public class Agent{
         count = 0;
     }
 
-    public void move_exp(Grid grid){
+    public void move_exp(Grid grid, Agent[] agents){
         for(int i=0; i<Variable.n; i++){
             for(int j=0; j<Variable.m; j++){
                PherMatrix[i][j] = grid.areaPherData[i][j];
@@ -480,7 +616,7 @@ public class Agent{
 
         //System.out.printf("x: (%d, %d)\n", x_row, x_col);
 
-        //grid.deletePos(this);
+        grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
 
@@ -490,7 +626,7 @@ public class Agent{
         //System.out.printf("now: (%d, %d)\n", row, col);
         //System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
 
-        //grid.recordPos(this);
+        grid.recordPos(this);
     }
 
     public int maxIndex(double[][] indic){
