@@ -323,7 +323,7 @@ public class AgentDup{
         */
     }
 
-    public void exploration(GridDupDup grid){
+    public void exploration(GridDup grid){
         int leftEnd, rightEnd;
         int upperEnd, lowerEnd;
         leftEnd = (areaNo % Variable.m) * Variable.W;

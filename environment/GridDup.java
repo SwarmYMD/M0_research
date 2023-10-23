@@ -2,7 +2,7 @@ package environment;
 
 import java.util.*;
 
-public class Grid{
+public class GridDup{
 
     public int h;
     public int w;
@@ -15,7 +15,7 @@ public class Grid{
     public boolean[][] alreadyUpdateDis = new boolean[Variable.N][Variable.M];
     public boolean[][] alreadyUpdateExp = new boolean[Variable.n][Variable.m];
 
-    public Grid(){
+    public GridDup(){
         this.h = grid.length;
         this.w = grid[0].length();
         for(int i=0; i<h; i++){
@@ -45,11 +45,11 @@ public class Grid{
         Arrays.fill(vacant, false);
     }
 
-    public void recordPos(Agent agent){
+    public void recordPos(AgentDup agent){
         agent_pos[agent.row][agent.col] = 1;
     }
 
-    public void deletePos(Agent agent){
+    public void deletePos(AgentDup agent){
         agent_pos[agent.row][agent.col] = 0;
     }
 

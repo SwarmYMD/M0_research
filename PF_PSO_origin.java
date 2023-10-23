@@ -7,7 +7,7 @@ import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PF_PSO{
+public class PF_PSO_origin{
     public static void main(String[] args) {
         GridDup grid = new GridDup();
 
