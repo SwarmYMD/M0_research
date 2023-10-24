@@ -22,6 +22,7 @@ public class Agent{
     int pld_row;
     int pgd_col;
     int pgd_row;
+    int flag = 0;
 
     int next_area;
 
@@ -147,6 +148,9 @@ public class Agent{
                     length_move = length_move + 1;
                     col = a;
                     row = b;
+                    if(grid.agent_pos[b][a] == 1){
+                        System.out.println("Invalid in termination point");
+                    }
                     grid.agent_pos[b][a] = 1;
 
                     if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
@@ -356,7 +360,6 @@ public class Agent{
     public void check_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent[] agents, int mr, int mc){
         ArrayList<Integer> candiList = new ArrayList<Integer>();
         int change_pos;
-        int flag = 0;
         for(int i = 0; i < Variable.AGENT_NUM; i++){
             if(this != agents[i]){
             //System.out.printf("agents[%d] pos: (%d, %d)\n", i, agents[i].row, agents[i].col);
@@ -383,6 +386,9 @@ public class Agent{
                         agents[i].length_move = agents[i].length_move + 1;
                         agents[i].col = a;
                         agents[i].row = b;
+                        if(grid.agent_pos[b][a] == 1){
+                            System.out.println("Invalid in check_dis");
+                        }
                         grid.agent_pos[b][a] = 1;
 
                         if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
@@ -686,7 +692,6 @@ public class Agent{
     public void check_exp(Grid grid, Agent[] agents, int mr, int mc){
         ArrayList<Integer> candiList = new ArrayList<Integer>();
         int change_pos;
-        int flag = 0;
         for(int i = 0; i < Variable.AGENT_NUM; i++){
             if(this != agents[i]){
             //System.out.printf("agents[%d] pos: (%d, %d)\n", i, agents[i].row, agents[i].col);
@@ -713,6 +718,9 @@ public class Agent{
                         agents[i].length_move = agents[i].length_move + 1;
                         agents[i].col = a;
                         agents[i].row = b;
+                        if(grid.agent_pos[b][a] == 1){
+                            System.out.println("Invalid in check_exp");
+                        }
                         grid.agent_pos[b][a] = 1;
 
                         if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
