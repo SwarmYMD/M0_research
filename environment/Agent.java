@@ -136,7 +136,7 @@ public class Agent{
             pre_c = col;
             pre_r = row;
             
-            
+            /*
             if(not_move_count >= 10){
                 for(int j = 0; j < 4; j++){
                     int r = row + Variable.dir_row[j];
@@ -172,6 +172,7 @@ public class Agent{
             }
 
             candidate.clear();
+            */
             
             
 

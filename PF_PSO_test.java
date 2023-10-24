@@ -94,15 +94,6 @@ public class PF_PSO_test{
                     // exploration mode
                         agents[j].exploration(grid, agents); 
                     }
-
-                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        fw[i].append(String.valueOf(agents[j].col));
-                        fw[i].append(",");
-                        fw[i].append(String.valueOf(agents[j].row));
-                        fw[i].append("\n");
-                    }
-                    fw[i].close();
                     
                     /*
                     fw[i].append(String.valueOf(agents[j].col));
@@ -130,6 +121,15 @@ public class PF_PSO_test{
                     System.out.println();
                 }
                 */
+
+                fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                for (int j=0; j<Variable.AGENT_NUM; j++){
+                    fw[i].append(String.valueOf(agents[j].col));
+                    fw[i].append(",");
+                    fw[i].append(String.valueOf(agents[j].row));
+                    fw[i].append("\n");
+                }
+                fw[i].close();
                 
                 
 
