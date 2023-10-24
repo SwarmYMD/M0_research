@@ -123,14 +123,16 @@ public class Agent{
             } else {
                 not_move_count = 0;
             }
-            /* 
-
-            if(not_move_count >= 20){
+            pre_c = col;
+            pre_r = row;
+            
+            
+            if(not_move_count >= 10){
                 for(int j = 0; j < 4; j++){
                     int r = row + Variable.dir_row[j];
                     int c = col + Variable.dir_col[j];
                     if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
-                        if(grid.agent_pos[r][c] != 1 && grid.table[r][c] == 1){
+                        if(grid.agent_pos[r][c] == 0 && grid.table[r][c] == 1){
                             candiList.add(r*Variable.M+c);
                         }
                     }
@@ -151,9 +153,12 @@ public class Agent{
                         grid.occupied[b][a] = 1;
                     }
 
+                }else{
+                    
                 }
             }
-            */
+            
+            
 
             grid.pherData[row][col] = Variable.alpha * grid.pherData[row][col] + Variable.c * sum_pher;
             if(grid.pherData[row][col] > Variable.max_tau){
@@ -170,9 +175,7 @@ public class Agent{
             sum_pher = 0;
             grid.alreadyUpdateDis[row][col] = true;
             grid.alreadyUpdateExp[h][w] = true;
-            if(grid.agent_pos[row][col] == 1){
-                grid.recordPos(this);
-            }
+            
             return;
         }
 
@@ -353,16 +356,18 @@ public class Agent{
     public void check_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent[] agents, int mr, int mc){
         ArrayList<Integer> candiList = new ArrayList<Integer>();
         int change_pos;
+        int flag = 0;
         for(int i = 0; i < Variable.AGENT_NUM; i++){
             if(this != agents[i]){
             //System.out.printf("agents[%d] pos: (%d, %d)\n", i, agents[i].row, agents[i].col);
                 if(mr == agents[i].row && mc == agents[i].col){
+                    flag = 1;
                     for(int j = 0; j < 4; j++){
                         int r = agents[i].row + Variable.dir_row[j];
                         int c = agents[i].col + Variable.dir_col[j];
                         if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
-                            if(grid.agent_pos[r][c] != 1){
-                                if(grid.table[agents[i].row][agents[i].col] == 1 && grid.table[r][c] == 1){
+                            if(grid.agent_pos[r][c] == 0){
+                                if(grid.table[r][c] == 1){
                                     candiList.add(r*Variable.M+c);
                                 }
                             }
@@ -406,18 +411,31 @@ public class Agent{
                                 }
                             }
                         }
-                        length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
-                        grid.deletePos(this);
-                        col = mc;
-                        row = mr;
+                        if(candiList.size() != 0){
+                            change_pos = candiList.get(0);
+                            int a = change_pos % Variable.M;
+                            int b = change_pos / Variable.M;
+                            grid.agent_pos[agents[i].row][agents[i].col] = 0;
+                            agents[i].length_move = agents[i].length_move + 1;
+                            agents[i].col = a;
+                            agents[i].row = b;
+                            grid.agent_pos[b][a] = 1;
 
-                        
-                        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
-                            grid.occupied[row][col] = 1;
+
+                            length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+                            grid.deletePos(this);
+                            col = mc;
+                            row = mr;
+
+                            
+                            if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                                grid.occupied[row][col] = 1;
+                            }
+                            grid.recordPos(this);
                         }
-                        grid.recordPos(this);
                     }
                 } else {
+                    /*
                     length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
                     grid.deletePos(this);
                     col = mc;
@@ -427,11 +445,27 @@ public class Agent{
                         grid.occupied[row][col] = 1;
                     }
                     grid.recordPos(this);
+                    */
                 }
             }
         }
 
         candiList.clear();
+
+        if(flag == 0){
+            length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+            grid.deletePos(this);
+            col = mc;
+            row = mr;
+
+            
+            if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                grid.occupied[row][col] = 1;
+            }
+            grid.recordPos(this);
+        }
+
+        flag = 0;
         
         /*
         //grid.deletePos(this);
@@ -457,13 +491,14 @@ public class Agent{
         //System.out.print(areaNo);
         //System.out.println();
 
+        /*
         for(int i=0; i<Variable.H; i++){
             for(int j=0; j<Variable.W; j++){
                 //System.out.printf("%f,", disIndicMatrix[i][j]);
             }
             //System.out.println();
         }
-        /*
+        
         System.out.printf("x: (%.1f, %.1f), ", x_row, x_col);
         System.out.printf("areaNo: %d, ", areaNo);
         System.out.printf("left, right: (%d, %d)\n", leftEnd, rightEnd);
@@ -547,6 +582,7 @@ public class Agent{
             }
 
             //System.out.printf("x: (%d, %d)\n", x_row, x_col);
+            /*
 
             grid.deletePos(this);
 
@@ -556,6 +592,8 @@ public class Agent{
             row = move_row;
 
             grid.recordPos(this);
+            */
+            check_exp(grid, agents, move_row, move_col);
         } else {
             move_exp(grid, agents);
         }
@@ -629,6 +667,7 @@ public class Agent{
 
         //System.out.printf("x: (%d, %d)\n", x_row, x_col);
 
+        /*
         grid.deletePos(this);
 
         length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
@@ -640,6 +679,165 @@ public class Agent{
         //System.out.printf("pgd: (%d, %d)\n", pgd_row, pgd_col);
 
         grid.recordPos(this);
+        */
+        check_exp(grid, agents, move_row, move_col);
+    }
+
+    public void check_exp(Grid grid, Agent[] agents, int mr, int mc){
+        ArrayList<Integer> candiList = new ArrayList<Integer>();
+        int change_pos;
+        int flag = 0;
+        for(int i = 0; i < Variable.AGENT_NUM; i++){
+            if(this != agents[i]){
+            //System.out.printf("agents[%d] pos: (%d, %d)\n", i, agents[i].row, agents[i].col);
+                if(mr == agents[i].row && mc == agents[i].col){
+                    flag = 1;
+                    for(int j = 0; j < 4; j++){
+                        int r = agents[i].row + Variable.dir_row[j];
+                        int c = agents[i].col + Variable.dir_col[j];
+                        if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
+                            if(grid.agent_pos[r][c] != 1){
+                                if(grid.table[r][c] == 1){
+                                    candiList.add(r*Variable.M+c);
+                                }
+                            }
+                        }
+                    }
+                    if(candiList.size() != 0){
+                        Collections.shuffle(candiList);
+                        change_pos = candiList.get(0);
+                        int a = change_pos % Variable.M;
+                        int b = change_pos / Variable.M;
+                        grid.agent_pos[agents[i].row][agents[i].col] = 0;
+                        grid.occupied[agents[i].row][agents[i].col] = 0;
+                        agents[i].length_move = agents[i].length_move + 1;
+                        agents[i].col = a;
+                        agents[i].row = b;
+                        grid.agent_pos[b][a] = 1;
+
+                        if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
+                            grid.occupied[b][a] = 1;
+                        }
+
+                        length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+
+                        grid.deletePos(this);
+                        col = mc;
+                        row = mr;
+
+                        
+                        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                            grid.occupied[row][col] = 1;
+                        }
+                        grid.recordPos(this);
+
+                    }else if(grid.table[agents[i].row][agents[i].col] == 0){
+                        for(int j = 0; j < 4; j++){
+                            int r = agents[i].row + Variable.dir_row[j];
+                            int c = agents[i].col + Variable.dir_col[j];
+                            if(r >= 0 && r < Variable.N && c >= 0 && c < Variable.M){
+                                if(grid.agent_pos[r][c] != 1){
+                                    candiList.add(r*Variable.M+c);
+                                }
+                            }
+                        }
+                        if(candiList.size() != 0){
+                            change_pos = candiList.get(0);
+                            int a = change_pos % Variable.M;
+                            int b = change_pos / Variable.M;
+                            grid.agent_pos[agents[i].row][agents[i].col] = 0;
+                            grid.occupied[agents[i].row][agents[i].col] = 0;
+                            agents[i].length_move = agents[i].length_move + 1;
+                            agents[i].col = a;
+                            agents[i].row = b;
+                            grid.agent_pos[b][a] = 1;
+
+                            if(grid.table[b][a] == 1 && grid.occupied[b][a] == 0){
+                                grid.occupied[b][a] = 1;
+                            }
+
+                            length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+                            grid.deletePos(this);
+                            col = mc;
+                            row = mr;
+
+                            
+                            if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                                grid.occupied[row][col] = 1;
+                            }
+                            grid.recordPos(this);
+
+                            //System.out.println("pass the check_exp");
+                        }
+                    }
+                } else {
+                    /*
+                    length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+                    grid.deletePos(this);
+                    col = mc;
+                    row = mr;
+
+                    if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                        grid.occupied[row][col] = 1;
+                    }
+                    grid.recordPos(this);
+                    */
+                }
+            }
+        }
+
+        candiList.clear();
+
+        if(flag == 0){
+            length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
+            grid.deletePos(this);
+            col = mc;
+            row = mr;
+
+            
+            if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+                grid.occupied[row][col] = 1;
+            }
+            grid.recordPos(this);
+        }
+
+        flag = 0;
+        
+        /*
+        //grid.deletePos(this);
+
+        length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
+
+        col = move_col;
+        row = move_row;
+
+        
+        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
+            grid.occupied[row][col] = 1;
+        }
+        */
+        
+
+        //grid.recordPos(this);
+
+        // checking behavior of this function
+
+        //System.out.printf("now: (%d, %d)\n", row, col);
+
+        //System.out.print(areaNo);
+        //System.out.println();
+
+        for(int i=0; i<Variable.H; i++){
+            for(int j=0; j<Variable.W; j++){
+                //System.out.printf("%f,", disIndicMatrix[i][j]);
+            }
+            //System.out.println();
+        }
+        /*
+        System.out.printf("x: (%.1f, %.1f), ", x_row, x_col);
+        System.out.printf("areaNo: %d, ", areaNo);
+        System.out.printf("left, right: (%d, %d)\n", leftEnd, rightEnd);
+        */
     }
 
     public int maxIndex(double[][] indic){

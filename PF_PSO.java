@@ -79,11 +79,7 @@ public class PF_PSO{
             //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                for(int k=0; k<Variable.N; k++){
-                    for(int s=0; s<Variable.M; s++){
-                        grid.agent_pos[k][s] = 0;
-                    }
-                }
+                
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
@@ -156,9 +152,11 @@ public class PF_PSO{
                     }
                     System.out.printf("\n");
 
+                    /*
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         grid.recordPos(agents[j]);
                     }
+                    */
 
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
@@ -185,9 +183,11 @@ public class PF_PSO{
                     break;
                 }
 
+                /*
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     grid.recordPos(agents[j]);
                 }
+                */
 
                 /*
                 //if((i+1)%100 == 0){
@@ -240,6 +240,7 @@ public class PF_PSO{
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         System.out.print(agents[j].state);
                     }
+                    System.out.println();
 
                     fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
                     for (int j=0; j<Variable.AGENT_NUM; j++){
@@ -249,6 +250,14 @@ public class PF_PSO{
                         fw[i].append("\n");
                     }
                     fw[i].close();
+
+                    for(int k=0; k<Variable.N; k++){
+                        for(int s=0; s<Variable.M; s++){
+                            System.out.print(grid.agent_pos[k][s]);
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
                 }
                 
 
