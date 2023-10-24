@@ -7,7 +7,7 @@ import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PF_PSO{
+public class PF_PSO_test{
     public static void main(String[] args) {
         Grid grid = new Grid();
 
@@ -78,8 +78,7 @@ public class PF_PSO{
             for(int i=0; i<Variable.maxStep; i++){
             //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
-                //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                
+                //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");                
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
@@ -95,6 +94,15 @@ public class PF_PSO{
                     // exploration mode
                         agents[j].exploration(grid, agents); 
                     }
+
+                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                    for (int j=0; j<Variable.AGENT_NUM; j++){
+                        fw[i].append(String.valueOf(agents[j].col));
+                        fw[i].append(",");
+                        fw[i].append(String.valueOf(agents[j].row));
+                        fw[i].append("\n");
+                    }
+                    fw[i].close();
                     
                     /*
                     fw[i].append(String.valueOf(agents[j].col));
@@ -123,26 +131,7 @@ public class PF_PSO{
                 }
                 */
                 
-                if(finish_agent >= Variable.AGENT_NUM / 2){
-                    if(half_flag == false){
-                        System.out.printf("PF 50 percent achieved.\n");
-                        System.out.printf("50 percent steps: %d\n", i+1);
-                        for (int j=0; j<Variable.AGENT_NUM; j++){
-                            System.out.print(agents[j].state);
-                        }
-                        System.out.printf("\n");
-
-                        fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                        for (int j=0; j<Variable.AGENT_NUM; j++){
-                            fw[i].append(String.valueOf(agents[j].col));
-                            fw[i].append(",");
-                            fw[i].append(String.valueOf(agents[j].row));
-                            fw[i].append("\n");
-                        }
-                        fw[i].close();
-                    }
-                    half_flag = true;
-                }
+                
 
                 if(finish_agent == Variable.AGENT_NUM){
                     System.out.printf("PF completes.\n");
@@ -172,6 +161,7 @@ public class PF_PSO{
                         }
                     }
                     
+                    /*
                     fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         fw[i].append(String.valueOf(agents[j].col));
@@ -180,6 +170,7 @@ public class PF_PSO{
                         fw[i].append("\n");
                     }
                     fw[i].close();
+                    */
                     break;
                 }
 
@@ -234,39 +225,7 @@ public class PF_PSO{
                 */
 
                 
-                if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
-                    System.out.printf("Reach the final step and FAILURE...\n\n");
-
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        System.out.print(agents[j].state);
-                    }
-                    System.out.println();
-
-                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        fw[i].append(String.valueOf(agents[j].col));
-                        fw[i].append(",");
-                        fw[i].append(String.valueOf(agents[j].row));
-                        fw[i].append("\n");
-                    }
-                    fw[i].close();
-
-                    for(int k=0; k<Variable.N; k++){
-                        for(int s=0; s<Variable.M; s++){
-                            System.out.print(grid.agent_pos[k][s]);
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-
-                    for(int k=0; k<Variable.N; k++){
-                        for(int s=0; s<Variable.M; s++){
-                            System.out.print(grid.occupied[k][s]);
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-                }
+            
                 
 
                 //fw[i].close();
