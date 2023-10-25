@@ -23,6 +23,8 @@ public class Agent{
     int pgd_col;
     int pgd_row;
 
+    int stop = 0;
+
     int flag = 0;
     int pre_r = row;
     int pre_c = col;
@@ -136,7 +138,7 @@ public class Agent{
             pre_c = col;
             pre_r = row;
             
-            /*
+            
             if(not_move_count >= 10){
                 for(int j = 0; j < 4; j++){
                     int r = row + Variable.dir_row[j];
@@ -172,7 +174,8 @@ public class Agent{
             }
 
             candidate.clear();
-            */
+            
+            
             
             
 
@@ -318,56 +321,7 @@ public class Agent{
             x_row = move_row;
         }
 
-        /*
-        // check the next position that is unoccupied pattern grid
-        List<List<Integer>> neighbors = new ArrayList<List<Integer>>(); 
-        System.out.printf("pattern grid?: %d\n", grid.table[x_row][x_col]);
-        while(grid.table[x_row][x_col] == 1){
-            if(grid.occupied[x_row][x_col] == 1){
-                neighbors.add(Arrays.asList(x_row,x_col-1));
-                neighbors.add(Arrays.asList(x_row,x_col+1));
-                neighbors.add(Arrays.asList(x_row-1,x_col));
-                neighbors.add(Arrays.asList(x_row+1,x_col));
-                Collections.shuffle(neighbors);
-
-                x_row = neighbors.get(0).get(0);
-                x_col = neighbors.get(0).get(1);
-
-                neighbors.clear();
-
-                // prevent going over other area
-                if(x_col < leftEnd){
-                    x_col = leftEnd;
-                } else{
-                    x_col = rightEnd;
-                }
-
-                if(x_row < upperEnd){
-                    x_row = upperEnd;
-                } else{
-                    x_row = lowerEnd;
-                }
-            }
-        }
-
-        */
-
-        //System.out.printf("x2: (%d, %d)\n", x_row, x_col);
-        /*
-
-        grid.deletePos(this);
-
-        length_move = length_move + Math.abs(col - move_col) + Math.abs(row - move_row);
-
-        col = move_col;
-        row = move_row;
-
-        if(grid.table[row][col] == 1 && grid.occupied[row][col] == 0){
-            grid.occupied[row][col] = 1;
-        }
-
-        grid.recordPos(this);
-        */
+        
 
         check_dis(grid, leftEnd, rightEnd, upperEnd, lowerEnd, agents, move_row, move_col);
 
@@ -425,6 +379,8 @@ public class Agent{
                         col = mc;
                         row = mr;
 
+                        stop = 0;
+
                         
                         if(grid.table[row][col] == 1){
                             grid.occupied[row][col] = 1;
@@ -457,6 +413,8 @@ public class Agent{
                             col = mc;
                             row = mr;
 
+                            stop = 0;
+
                             
                             if(grid.table[row][col] == 1){
                                 grid.occupied[row][col] = 1;
@@ -465,6 +423,8 @@ public class Agent{
                         }
                     }
                 } else {
+                    stop = 1;
+
                     /*
                     length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
                     grid.deletePos(this);
@@ -493,6 +453,9 @@ public class Agent{
                 grid.occupied[row][col] = 1;
             }
             grid.recordPos(this);
+        } else  if(col != mc && row != mr){
+            v_col = 0;
+            v_row = 0;
         }
 
         flag = 0;
@@ -726,6 +689,7 @@ public class Agent{
     public void check_exp(Grid grid, Agent[] agents, int mr, int mc){
         ArrayList<Integer> candiList = new ArrayList<Integer>();
         int change_pos;
+        //int unyo = 0;
         for(int i = 0; i < Variable.AGENT_NUM; i++){
             if(this != agents[i]){
             //System.out.printf("agents[%d] pos: (%d, %d)\n", i, agents[i].row, agents[i].col);
@@ -768,6 +732,8 @@ public class Agent{
                         col = mc;
                         row = mr;
 
+                        stop = 0;
+
                         
                         if(grid.table[row][col] == 1){
                             grid.occupied[row][col] = 1;
@@ -805,6 +771,8 @@ public class Agent{
                             col = mc;
                             row = mr;
 
+                            stop = 0;
+
                             
                             if(grid.table[row][col] == 1){
                                 grid.occupied[row][col] = 1;
@@ -815,6 +783,7 @@ public class Agent{
                         }
                     }
                 } else {
+                    stop = 1;
                     /*
                     length_move = length_move + Math.abs(col - mc) + Math.abs(row - mr);
                     grid.deletePos(this);
@@ -828,7 +797,10 @@ public class Agent{
                     */
                 }
             }
+            //unyo = i;
         }
+
+        //System.out.println(unyo);
 
         candiList.clear();
 
@@ -843,6 +815,9 @@ public class Agent{
                 grid.occupied[row][col] = 1;
             }
             grid.recordPos(this);
+        } else if(col != mc && row != mr){
+            v_col = 0;
+            v_row = 0;
         }
 
         flag = 0;

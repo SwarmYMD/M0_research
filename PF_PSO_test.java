@@ -14,6 +14,7 @@ public class PF_PSO_test{
         int initial_pos;
         int finish_agent = 0;
         boolean half_flag = false;
+        int count = 0;
 
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
@@ -67,7 +68,7 @@ public class PF_PSO_test{
         */
         
         try{
-            FileWriter f = new FileWriter("./csv/step0.csv");
+            FileWriter f = new FileWriter("./csv_test/step0.csv");
             for (int j=0; j<Variable.AGENT_NUM; j++){
                 f.append(String.valueOf(agents[j].col));
                 f.append(",");
@@ -78,7 +79,7 @@ public class PF_PSO_test{
             for(int i=0; i<Variable.maxStep; i++){
             //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
-                //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");                
+                //fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");                
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
@@ -122,7 +123,7 @@ public class PF_PSO_test{
                 }
                 */
 
-                fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     fw[i].append(String.valueOf(agents[j].col));
                     fw[i].append(",");
@@ -131,7 +132,19 @@ public class PF_PSO_test{
                 }
                 fw[i].close();
                 
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        if(grid.agent_pos[k][s] == 1){
+                            count++;
+                        }
+                    }
+                }
                 
+                if(count != Variable.AGENT_NUM){
+                    System.out.printf("Duplicate occured in step %d !\n", i+1);
+                }
+
+                count = 0;
 
                 if(finish_agent == Variable.AGENT_NUM){
                     System.out.printf("PF completes.\n");
@@ -162,7 +175,7 @@ public class PF_PSO_test{
                     }
                     
                     /*
-                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                    fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         fw[i].append(String.valueOf(agents[j].col));
                         fw[i].append(",");

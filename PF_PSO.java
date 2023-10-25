@@ -15,6 +15,8 @@ public class PF_PSO{
         int finish_agent = 0;
         boolean half_flag = false;
 
+        int count = 0;
+
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
         FileWriter[] fw = new FileWriter[Variable.maxStep];
@@ -75,10 +77,12 @@ public class PF_PSO{
                 f.append("\n");
             }
             f.close();
-            for(int i=0; i<Variable.maxStep; i++){
-            //for(int i=0; ; i++){
+            //for(int i=0; i<Variable.maxStep; i++){
+            for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+
+                System.out.printf("Now: step %d\n", i+1);
                 
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
@@ -122,6 +126,27 @@ public class PF_PSO{
                     System.out.println();
                 }
                 */
+
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        if(grid.agent_pos[k][s] == 1){
+                            count++;
+                        }
+                    }
+                }
+                
+                if(count != Variable.AGENT_NUM){
+                    System.out.printf("Duplicate occured in step %d !\n", i+1);
+                    for(int k=0; k<Variable.N; k++){
+                        for(int s=0; s<Variable.M; s++){
+                            System.out.print(grid.agent_pos[k][s]);
+                        }
+                        System.out.println();
+                    }
+                    System.out.println();
+                }
+
+                count = 0;
                 
                 if(finish_agent >= Variable.AGENT_NUM / 2){
                     if(half_flag == false){
