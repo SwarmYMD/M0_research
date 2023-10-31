@@ -77,8 +77,8 @@ public class PF_PSO{
                 f.append("\n");
             }
             f.close();
-            //for(int i=0; i<Variable.maxStep; i++){
-            for(int i=0; ; i++){
+            for(int i=0; i<Variable.maxStep; i++){
+            //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
 
