@@ -1,0 +1,2 @@
+javac .\PF_PSO.java ./environment/Variable.java ./environment/Agent.java ./environment/Grid.java
+java PF_PSO

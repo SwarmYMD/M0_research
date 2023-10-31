@@ -1,15 +1,15 @@
 import environment.Variable;
-import environment.GridDup;
-import environment.AgentDup;
+import environment.Grid;
+import environment.Agent;
 
 import java.util.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PF_PSO_origin{
+public class PF_check{
     public static void main(String[] args) {
-        GridDup grid = new GridDup();
+        Grid grid = new Grid();
 
         int initial_pos;
         int finish_agent = 0;
@@ -27,10 +27,10 @@ public class PF_PSO_origin{
         //System.out.println(randomList);
 
         // Initial setting of agents.
-        AgentDup[] agents = new AgentDup[Variable.AGENT_NUM];
+        Agent[] agents = new Agent[Variable.AGENT_NUM];
         for (int i=0; i<Variable.AGENT_NUM; i++){
             initial_pos = randomList.get(i);
-            agents[i] = new AgentDup(initial_pos/Variable.M, initial_pos%Variable.M);
+            agents[i] = new Agent(initial_pos/Variable.M, initial_pos%Variable.M);
             agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
             grid.recordPos(agents[i]);
             //System.out.printf("(%d, %d)\n", agents[i].row, agents[i].col);
@@ -62,7 +62,7 @@ public class PF_PSO_origin{
         
         /*
         if(agents[0].state.equals("d")){
-            agents[0].dispersion(grid); 
+            agents[0].dispersion(grid, agents); 
         }
         */
         
@@ -75,29 +75,31 @@ public class PF_PSO_origin{
                 f.append("\n");
             }
             f.close();
-            for(int i=0; i<Variable.maxStep; i++){
+            for(int i=0; i<10; i++){
             //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
                 //fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                /*
                 for(int k=0; k<Variable.N; k++){
                     for(int s=0; s<Variable.M; s++){
                         grid.agent_pos[k][s] = 0;
                     }
                 }
+                */
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
                     calc_sum_pher(agents, agents[j], grid);
 
                     if(agents[j].state.equals("t")){
-                        agents[j].dispersion(grid); 
+                        agents[j].dispersion(grid, agents); 
                     }else if(agents[j].state.equals("d")){
                     // dispersion mode
-                        agents[j].dispersion(grid); 
+                        agents[j].dispersion(grid, agents); 
                         //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
                     }else if(agents[j].state.equals("e")){
                     // exploration mode
-                        agents[j].exploration(grid); 
+                        agents[j].exploration(grid, agents); 
                     }
                     
                     /*
@@ -127,67 +129,13 @@ public class PF_PSO_origin{
                 }
                 */
                 
-                if(finish_agent >= Variable.AGENT_NUM / 2){
-                    if(half_flag == false){
-                        System.out.printf("PF 50 percent achieved.\n");
-                        System.out.printf("50 percent steps: %d\n", i+1);
-                        for (int j=0; j<Variable.AGENT_NUM; j++){
-                            System.out.print(agents[j].state);
-                        }
-                        System.out.printf("\n");
+                
 
-                        fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                        for (int j=0; j<Variable.AGENT_NUM; j++){
-                            fw[i].append(String.valueOf(agents[j].col));
-                            fw[i].append(",");
-                            fw[i].append(String.valueOf(agents[j].row));
-                            fw[i].append("\n");
-                        }
-                        fw[i].close();
-                    }
-                    half_flag = true;
-                }
-
-                if(finish_agent == Variable.AGENT_NUM){
-                    System.out.printf("PF completes.\n");
-                    System.out.printf("total steps: %d\n", i+1);
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        System.out.print(agents[j].state);
-                    }
-                    System.out.printf("\n");
-
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        grid.recordPos(agents[j]);
-                    }
-
-                    for(int k=0; k<Variable.N; k++){
-                        for(int s=0; s<Variable.M; s++){
-                            System.out.print(grid.agent_pos[k][s]);
-                        }
-                        System.out.println();
-                    }
-                    System.out.println();
-
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        if(grid.agent_pos[agents[j].row][agents[j].col] != 1){
-                            System.out.printf("Strange pos: (%d, %d)\n", agents[j].row, agents[j].col);
-                        }
-                    }
-                    
-                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        fw[i].append(String.valueOf(agents[j].col));
-                        fw[i].append(",");
-                        fw[i].append(String.valueOf(agents[j].row));
-                        fw[i].append("\n");
-                    }
-                    fw[i].close();
-                    break;
-                }
-
+                /*
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     grid.recordPos(agents[j]);
                 }
+                */
 
                 /*
                 //if((i+1)%100 == 0){
@@ -233,32 +181,23 @@ public class PF_PSO_origin{
                 System.out.println();
                 */
 
-                
-                if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
-                    System.out.printf("Reach the final step and FAILURE...\n\n");
-
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        System.out.print(agents[j].state);
-                    }
-                    System.out.println();
-
-                    fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
-                    for (int j=0; j<Variable.AGENT_NUM; j++){
-                        fw[i].append(String.valueOf(agents[j].col));
-                        fw[i].append(",");
-                        fw[i].append(String.valueOf(agents[j].row));
-                        fw[i].append("\n");
-                    }
-                    fw[i].close();
-
-                    for(int k=0; k<Variable.N; k++){
-                        for(int s=0; s<Variable.M; s++){
-                            System.out.print(grid.agent_pos[k][s]);
-                        }
-                        System.out.println();
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        System.out.print(grid.agent_pos[k][s]);
                     }
                     System.out.println();
                 }
+                System.out.println();
+                    
+
+                fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
+                for (int j=0; j<Variable.AGENT_NUM; j++){
+                    fw[i].append(String.valueOf(agents[j].col));
+                    fw[i].append(",");
+                    fw[i].append(String.valueOf(agents[j].row));
+                    fw[i].append("\n");
+                }
+                fw[i].close();
                 
 
                 //fw[i].close();
@@ -296,7 +235,7 @@ public class PF_PSO_origin{
         
     }
 
-    public static void calc_sum_pher(AgentDup[] agents, AgentDup r, GridDup grid) {
+    public static void calc_sum_pher(Agent[] agents, Agent r, Grid grid) {
         r.sum_pher = 0;
     
         for(int i = r.row - r.range; i <= r.row + r.range; i++){
