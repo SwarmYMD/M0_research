@@ -17,13 +17,23 @@ public class PF_PSO_origin{
 
         double achieved_count = 0.0;
         double achieve_percent = 0.0;
+        double agent_percent = 0.0;
+
+        int pattern_num = 0;
 
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
         FileWriter[] fw = new FileWriter[Variable.maxStep];
 
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
-            randomList.add(i);
+            
+            if(grid.table[i/Variable.M][i%Variable.M] == 0){
+                randomList.add(i);
+            } else {
+                pattern_num++;
+            }
+            
+            //randomList.add(i);
         }
         Collections.shuffle(randomList);
 
@@ -33,7 +43,7 @@ public class PF_PSO_origin{
         AgentDup[] agents = new AgentDup[Variable.AGENT_NUM];
         for (int i=0; i<Variable.AGENT_NUM; i++){
             initial_pos = randomList.get(i);
-            agents[i] = new AgentDup(initial_pos/Variable.M, initial_pos%Variable.M);
+            agents[i] = new AgentDup(initial_pos%Variable.M, initial_pos/Variable.M);
             agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
             grid.recordPos(agents[i]);
             //System.out.printf("(%d, %d)\n", agents[i].row, agents[i].col);
@@ -78,6 +88,18 @@ public class PF_PSO_origin{
                 f.append("\n");
             }
             f.close();
+
+            FileWriter percent_recorder = new FileWriter("./percent_origin/percent.csv");
+
+            achieve_percent = achieved_count / Variable.AGENT_NUM * 100;
+            agent_percent = achieved_count / Variable.AGENT_NUM * 100;
+            percent_recorder.append(String.valueOf(0));
+            percent_recorder.append(",");
+            percent_recorder.append(String.valueOf(achieve_percent));
+            percent_recorder.append("\n");
+
+            achieved_count = 0;
+
             for(int i=0; i<Variable.maxStep; i++){
             //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
@@ -120,18 +142,6 @@ public class PF_PSO_origin{
                     }
                 }
 
-                for(int k=0; k<Variable.N; k++){
-                    for(int s=0; s<Variable.M; s++){
-                        if(grid.table[k][s] == 1){
-                            if(grid.agent_pos[k][s] == 1){
-                                achieved_count += 1;
-                            }
-                        }
-                    }
-                }
-
-                achieve_percent = achieved_count / Variable.AGENT_NUM;
-
                 /*
                 if(agents[0].state.equals(("d"))){
                     for(int k=0; k<Variable.H; k++){
@@ -144,7 +154,7 @@ public class PF_PSO_origin{
                 }
                 */
 
-                fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");
+                fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     fw[i].append(String.valueOf(agents[j].col));
                     fw[i].append(",");
@@ -218,6 +228,25 @@ public class PF_PSO_origin{
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     grid.recordPos(agents[j]);
                 }
+
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        if(grid.table[k][s] == 1){
+                            if(grid.agent_pos[k][s] == 1){
+                                achieved_count += 1;
+                            }
+                        }
+                    }
+                }
+
+                achieve_percent = achieved_count / pattern_num * 100;
+                agent_percent = achieved_count / Variable.AGENT_NUM * 100;
+                percent_recorder.append(String.valueOf(i+1));
+                percent_recorder.append(",");
+                percent_recorder.append(String.valueOf(achieve_percent));
+                percent_recorder.append("\n");
+
+                achieved_count = 0;
 
                 /*
                 //if((i+1)%100 == 0){
@@ -321,7 +350,8 @@ public class PF_PSO_origin{
                 }
 
             }
-            System.out.printf("achieved percent : %.3f\n", achieve_percent);
+            System.out.printf("achieved percent : %.2f%%\n", achieve_percent);
+            System.out.printf("agent percent : %.2f%%\n", agent_percent);
         } catch (Exception e) {
             e.printStackTrace();
         }

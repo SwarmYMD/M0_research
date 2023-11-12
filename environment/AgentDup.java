@@ -427,7 +427,7 @@ public class AgentDup{
             for(int j=0; j<Variable.m; j++){
                 d_exp = Math.abs(row - (i*Variable.H + Variable.H/2 )) + Math.abs(col - (j*Variable.W + Variable.W/2 ));
                 if (grid.vacant[i*Variable.m+j] == true){
-                    expIndicMatrix[i][j] = -1;
+                    expIndicMatrix[i][j] = 0;
                 } else if(d_exp != 0){
                     expIndicMatrix[i][j] = Math.exp(0-PherMatrix[i][j]) / d_exp;
                 } else {
