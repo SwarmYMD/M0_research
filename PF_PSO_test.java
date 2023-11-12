@@ -16,6 +16,9 @@ public class PF_PSO_test{
         boolean half_flag = false;
         int count = 0;
 
+        double achieved_count = 0.0;
+        double achieve_percent = 0.0;
+
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
         FileWriter[] fw = new FileWriter[Variable.maxStep];
@@ -79,7 +82,9 @@ public class PF_PSO_test{
             for(int i=0; i<Variable.maxStep; i++){
             //for(int i=0; ; i++){
             //for(int i=0; i<10; i++){
-                //fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");                
+                //fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");
+                
+                System.out.println("Now: step %d", i+1);
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
@@ -110,6 +115,18 @@ public class PF_PSO_test{
                         finish_agent += 1;
                     }
                 }
+
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        if(grid.table[k][s] == 1){
+                            if(grid.agent_pos[k][s] == 1){
+                                achieved_count += 1;
+                            }
+                        }
+                    }
+                }
+
+                achieve_percent = achieved_count / Variable.AGENT_NUM;
 
                 /*
                 if(agents[0].state.equals(("d"))){
@@ -184,6 +201,7 @@ public class PF_PSO_test{
                     }
                     fw[i].close();
                     */
+
                     break;
                 }
 
@@ -238,7 +256,7 @@ public class PF_PSO_test{
                 */
 
                 
-            
+                achieved_count = 0;
                 
 
                 //fw[i].close();
@@ -270,6 +288,7 @@ public class PF_PSO_test{
                 }
 
             }
+            System.out.println("achieved percent : %.3f", achieve_percent);
         } catch (Exception e) {
             e.printStackTrace();
         }

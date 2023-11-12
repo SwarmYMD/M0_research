@@ -15,6 +15,9 @@ public class PF_PSO_origin{
         int finish_agent = 0;
         boolean half_flag = false;
 
+        double achieved_count = 0.0;
+        double achieve_percent = 0.0;
+
         ArrayList<Integer> randomList = new ArrayList<Integer>();
 
         FileWriter[] fw = new FileWriter[Variable.maxStep];
@@ -84,6 +87,8 @@ public class PF_PSO_origin{
                         grid.agent_pos[k][s] = 0;
                     }
                 }
+
+                System.out.println("Now: step %d", i+1);
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
@@ -115,6 +120,18 @@ public class PF_PSO_origin{
                     }
                 }
 
+                for(int k=0; k<Variable.N; k++){
+                    for(int s=0; s<Variable.M; s++){
+                        if(grid.table[k][s] == 1){
+                            if(grid.agent_pos[k][s] == 1){
+                                achieved_count += 1;
+                            }
+                        }
+                    }
+                }
+
+                achieve_percent = achieved_count / Variable.AGENT_NUM;
+
                 /*
                 if(agents[0].state.equals(("d"))){
                     for(int k=0; k<Variable.H; k++){
@@ -126,6 +143,17 @@ public class PF_PSO_origin{
                     System.out.println();
                 }
                 */
+
+                fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");
+                for (int j=0; j<Variable.AGENT_NUM; j++){
+                    fw[i].append(String.valueOf(agents[j].col));
+                    fw[i].append(",");
+                    fw[i].append(String.valueOf(agents[j].row));
+                    fw[i].append("\n");
+                }
+                fw[i].close();
+
+                /*
                 
                 if(finish_agent >= Variable.AGENT_NUM / 2){
                     if(half_flag == false){
@@ -147,6 +175,7 @@ public class PF_PSO_origin{
                     }
                     half_flag = true;
                 }
+                */
 
                 if(finish_agent == Variable.AGENT_NUM){
                     System.out.printf("PF completes.\n");
@@ -173,7 +202,7 @@ public class PF_PSO_origin{
                             System.out.printf("Strange pos: (%d, %d)\n", agents[j].row, agents[j].col);
                         }
                     }
-                    
+                    /*
                     fw[i] = new FileWriter("./csv/step"+String.valueOf(i+1)+".csv");
                     for (int j=0; j<Variable.AGENT_NUM; j++){
                         fw[i].append(String.valueOf(agents[j].col));
@@ -182,6 +211,7 @@ public class PF_PSO_origin{
                         fw[i].append("\n");
                     }
                     fw[i].close();
+                    */
                     break;
                 }
 
@@ -233,7 +263,7 @@ public class PF_PSO_origin{
                 System.out.println();
                 */
 
-                
+                /*
                 if(i == Variable.maxStep - 1 && finish_agent < Variable.AGENT_NUM){
                     System.out.printf("Reach the final step and FAILURE...\n\n");
 
@@ -259,6 +289,7 @@ public class PF_PSO_origin{
                     }
                     System.out.println();
                 }
+                */
                 
 
                 //fw[i].close();
@@ -290,6 +321,7 @@ public class PF_PSO_origin{
                 }
 
             }
+            System.out.println("achieved percent : %.3f", achieve_percent);
         } catch (Exception e) {
             e.printStackTrace();
         }

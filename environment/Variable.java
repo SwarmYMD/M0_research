@@ -15,7 +15,7 @@ public class Variable{
     public static final double c = 0.8;
     public static final double Q = 1.0;
     public static final double max_tau = 3000;
-    public static final int maxStep = 100000;
+    public static final int maxStep = 100;
     public static final int[] dir_row = {-1, 1, 0, 0};
     public static final int[] dir_col = {0, 0, -1, 1};
 
