@@ -88,7 +88,7 @@ public class PF_PSO_origin{
                     }
                 }
 
-                System.out.println("Now: step %d", i+1);
+                System.out.printf("Now: step %d\n", i+1);
                 
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     agents[j].areaNo = agents[j].getAreaNo(agents[j].row, agents[j].col);
@@ -321,7 +321,7 @@ public class PF_PSO_origin{
                 }
 
             }
-            System.out.println("achieved percent : %.3f", achieve_percent);
+            System.out.printf("achieved percent : %.3f\n", achieve_percent);
         } catch (Exception e) {
             e.printStackTrace();
         }
