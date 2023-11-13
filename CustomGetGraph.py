@@ -5,13 +5,13 @@ import matplotlib.patches as patches
 width = 200
 height = 200
 half_step = 8
-final_step = 5000
+final_step = 100
 
 def getGraph():
     fig=plt.figure(figsize=(7,7))
     ax=plt.axes()
     data_set = np.loadtxt(
-        fname = "./csv/step0.csv",
+        fname = "./csv_test/step0.csv",
         dtype = int,
         delimiter = ","
     )
@@ -26,14 +26,14 @@ def getGraph():
     ax.axis("off")
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     ax.invert_yaxis()
-    fig.savefig("./pics/step0.png")
+    fig.savefig("./pics_test/step0.png")
     plt.close()
 
     fig=plt.figure(figsize=(7,7))
     ax=plt.axes()
 
     data_set2 = np.loadtxt(
-        fname = "./csv/step"+str(half_step)+".csv",
+        fname = "./csv_test/step"+str(half_step)+".csv",
         dtype = int,
         delimiter = ","
     )
@@ -48,14 +48,14 @@ def getGraph():
     ax.axis("off")
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     ax.invert_yaxis()
-    fig.savefig("./pics/step"+str(half_step)+".png")
+    fig.savefig("./pics_test/step"+str(half_step)+".png")
     plt.close()
 
     fig=plt.figure(figsize=(7,7))
     ax=plt.axes()
 
     data_set3 = np.loadtxt(
-        fname = "./csv/step"+str(final_step)+".csv",
+        fname = "./csv_test/step"+str(final_step)+".csv",
         dtype = int,
         delimiter = ","
     )
@@ -71,7 +71,7 @@ def getGraph():
     ax.axis("off")
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
     ax.invert_yaxis()
-    fig.savefig("./pics/step"+str(final_step)+".png")
+    fig.savefig("./pics_test/step"+str(final_step)+".png")
 
     plt.close()
 

@@ -4,7 +4,7 @@ import matplotlib.patches as patches
 
 width = 200
 height = 200
-steps = 100
+steps = 101
 
 def getGraph():
     for step in range(steps):

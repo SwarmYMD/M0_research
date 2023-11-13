@@ -4,7 +4,7 @@ import java.util.*;
 
 import environment.Variable;
 
-public class Agent{
+public class Agent_avoid{
     public int col;
     public int row;
     //int pos;
@@ -55,7 +55,7 @@ public class Agent{
 
     Random random = new Random();
 
-    public Agent(int c, int r){
+    public Agent_avoid(int c, int r){
         this.col = c;
         this.row = r;
         this.state = "d";
@@ -105,7 +105,7 @@ public class Agent{
         return x + y * Variable.m;
     }
 
-    public void dispersion(Grid grid, Agent[] agents){
+    public void dispersion(Grid_avoid grid, Agent_avoid[] agents){
         int leftEnd, rightEnd;
         int upperEnd, lowerEnd;
         leftEnd = (areaNo % Variable.m) * Variable.W;
@@ -243,7 +243,7 @@ public class Agent{
         count = 0;
     }
 
-    public void move_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent[] agents){
+    public void move_dis(Grid_avoid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent_avoid[] agents){
         // copy pheromone data of the area which this agent exists
         for(int i=upperEnd; i<=lowerEnd; i++){
             for(int j=leftEnd; j<=rightEnd; j++){
@@ -335,7 +335,7 @@ public class Agent{
         }
     }
 
-    public void check_dis(Grid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent[] agents, int mr, int mc){
+    public void check_dis(Grid_avoid grid, int leftEnd, int rightEnd, int upperEnd, int lowerEnd, Agent_avoid[] agents, int mr, int mc){
         ArrayList<Integer> candiList = new ArrayList<Integer>();
         int change_pos;
         for(int i = 0; i < Variable.AGENT_NUM; i++){
@@ -499,7 +499,7 @@ public class Agent{
         */
     }
 
-    public void exploration(Grid grid, Agent[] agents){
+    public void exploration(Grid_avoid grid, Agent_avoid[] agents){
         int leftEnd, rightEnd;
         int upperEnd, lowerEnd;
         leftEnd = (areaNo % Variable.m) * Variable.W;
@@ -599,7 +599,7 @@ public class Agent{
         count = 0;
     }
 
-    public void move_exp(Grid grid, Agent[] agents){
+    public void move_exp(Grid_avoid grid, Agent_avoid[] agents){
         for(int i=0; i<Variable.n; i++){
             for(int j=0; j<Variable.m; j++){
                PherMatrix[i][j] = grid.areaPherData[i][j];
@@ -687,7 +687,7 @@ public class Agent{
         }
     }
 
-    public void check_exp(Grid grid, Agent[] agents, int mr, int mc){
+    public void check_exp(Grid_avoid grid, Agent_avoid[] agents, int mr, int mc){
         ArrayList<Integer> candiList = new ArrayList<Integer>();
         int change_pos;
         //int unyo = 0;

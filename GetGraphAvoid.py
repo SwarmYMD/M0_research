@@ -11,7 +11,7 @@ def getGraph():
         fig=plt.figure(figsize=(7,7))
         ax=plt.axes()
         data_set = np.loadtxt(
-            fname = "./csv/step"+str(step)+".csv",
+            fname = "./csv_avoid/step"+str(step)+".csv",
             dtype = int,
             delimiter = ","
         )
@@ -26,7 +26,7 @@ def getGraph():
         ax.axis("off")
         fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
         ax.invert_yaxis()
-        fig.savefig("./pics/step"+str(step)+".png")
+        fig.savefig("./pics_avoid/step"+str(step)+".png")
         plt.close()
 
 getGraph()
