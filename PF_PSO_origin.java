@@ -350,6 +350,7 @@ public class PF_PSO_origin{
                 }
 
             }
+            percent_recorder.close();
             System.out.printf("achieved percent : %.2f%%\n", achieve_percent);
             System.out.printf("agent percent : %.2f%%\n", agent_percent);
         } catch (Exception e) {
