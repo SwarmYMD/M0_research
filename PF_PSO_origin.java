@@ -90,13 +90,19 @@ public class PF_PSO_origin{
             f.close();
 
             FileWriter percent_recorder = new FileWriter("./percent_origin/percent.csv");
+            FileWriter agent_recorder = new FileWriter("./percent_origin/agent.csv");
 
             achieve_percent = achieved_count / Variable.AGENT_NUM * 100;
-            agent_percent = achieved_count / Variable.AGENT_NUM * 100;
+            agent_percent = (double)finish_agent / Variable.AGENT_NUM * 100;
             percent_recorder.append(String.valueOf(0));
             percent_recorder.append(",");
             percent_recorder.append(String.valueOf(achieve_percent));
             percent_recorder.append("\n");
+
+            agent_recorder.append(String.valueOf(0));
+            agent_recorder.append(",");
+            agent_recorder.append(String.valueOf(agent_percent));
+            agent_recorder.append("\n");
 
             achieved_count = 0;
 
@@ -124,7 +130,11 @@ public class PF_PSO_origin{
                         //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
                     }else if(agents[j].state.equals("e")){
                     // exploration mode
-                        agents[j].exploration(grid); 
+                        if(grid.table[agents[j].row][agents[j].col] == 1){
+                            agents[j].state = "t";
+                        }else{
+                            agents[j].exploration(grid, agents);
+                        } 
                     }
                     
                     /*
@@ -201,6 +211,30 @@ public class PF_PSO_origin{
 
                     for(int k=0; k<Variable.N; k++){
                         for(int s=0; s<Variable.M; s++){
+                            if(grid.table[k][s] == 1){
+                                if(grid.agent_pos[k][s] == 1){
+                                    achieved_count += 1;
+                                }
+                            }
+                        }
+                    }
+
+                    achieve_percent = achieved_count / pattern_num * 100;
+                    agent_percent = (double)finish_agent / Variable.AGENT_NUM * 100;
+                    percent_recorder.append(String.valueOf(i+1));
+                    percent_recorder.append(",");
+                    percent_recorder.append(String.valueOf(achieve_percent));
+                    percent_recorder.append("\n");
+
+                    agent_recorder.append(String.valueOf(i+1));
+                    agent_recorder.append(",");
+                    agent_recorder.append(String.valueOf(agent_percent));
+                    agent_recorder.append("\n");
+
+                    achieved_count = 0;
+
+                    for(int k=0; k<Variable.N; k++){
+                        for(int s=0; s<Variable.M; s++){
                             System.out.print(grid.agent_pos[k][s]);
                         }
                         System.out.println();
@@ -240,11 +274,16 @@ public class PF_PSO_origin{
                 }
 
                 achieve_percent = achieved_count / pattern_num * 100;
-                agent_percent = achieved_count / Variable.AGENT_NUM * 100;
+                agent_percent = (double)finish_agent / Variable.AGENT_NUM * 100;
                 percent_recorder.append(String.valueOf(i+1));
                 percent_recorder.append(",");
                 percent_recorder.append(String.valueOf(achieve_percent));
                 percent_recorder.append("\n");
+
+                agent_recorder.append(String.valueOf(i+1));
+                agent_recorder.append(",");
+                agent_recorder.append(String.valueOf(agent_percent));
+                agent_recorder.append("\n");
 
                 achieved_count = 0;
 
@@ -351,6 +390,7 @@ public class PF_PSO_origin{
 
             }
             percent_recorder.close();
+            agent_recorder.close();
             System.out.printf("achieved percent : %.2f%%\n", achieve_percent);
             System.out.printf("agent percent : %.2f%%\n", agent_percent);
         } catch (Exception e) {
