@@ -136,11 +136,7 @@ public class PF_PSO_avoid{
                         //System.out.printf("agent[%d]'s now: (%d, %d)\n", j, agents[j].row, agents[j].col);
                     }else if(agents[j].state.equals("e")){
                     // exploration mode
-                        if(grid.table[agents[j].row][agents[j].col] == 1){
-                            agents[j].state = "t";
-                        }else{
-                            agents[j].exploration(grid, agents);
-                        }  
+                        agents[j].exploration(grid, agents); 
                     }
                     
                     /*
