@@ -331,6 +331,15 @@ public class AgentDup{
         upperEnd = (areaNo / Variable.m) * Variable.H;
         lowerEnd = upperEnd + Variable.H - 1;
 
+        if(grid.table[row][col] == 1){
+            //System.out.printf("this agent already reached goal.\n");
+            state = "t";
+            if(grid.table[row][col] == 1){
+                grid.occupied[row][col] = 1;
+            }
+            return;
+        }
+
         // count the number of pattern on grid
         for(int i=upperEnd; i<=lowerEnd; i++){
             for(int j=leftEnd; j<=rightEnd; j++){
