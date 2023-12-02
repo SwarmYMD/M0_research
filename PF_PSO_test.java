@@ -29,7 +29,12 @@ public class PF_PSO_test{
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             
             if(grid.table[i/Variable.M][i%Variable.M] == 0){
-                randomList.add(i);
+                /*
+                if((i%Variable.M > 45 && i%Variable.M < 157) && (i/Variable.M > 44 && i/Variable.M < 156)){
+                } else {
+                */
+                    randomList.add(i);
+                //}
             } else {
                 pattern_num++;
             }
@@ -101,13 +106,19 @@ public class PF_PSO_test{
             }
 
             FileWriter percent_recorder = new FileWriter("./percent/percent.csv");
+            FileWriter agent_recorder = new FileWriter("./percent/agent.csv");
 
             achieve_percent = achieved_count / Variable.AGENT_NUM * 100;
-            agent_percent = achieved_count / Variable.AGENT_NUM * 100;
+            agent_percent = (double)finish_agent / Variable.AGENT_NUM * 100;
             percent_recorder.append(String.valueOf(0));
             percent_recorder.append(",");
             percent_recorder.append(String.valueOf(achieve_percent));
             percent_recorder.append("\n");
+
+            agent_recorder.append(String.valueOf(0));
+            agent_recorder.append(",");
+            agent_recorder.append(String.valueOf(agent_percent));
+            agent_recorder.append("\n");
 
             achieved_count = 0;
             
@@ -159,11 +170,16 @@ public class PF_PSO_test{
                 }
 
                 achieve_percent = achieved_count / pattern_num * 100;
-                agent_percent = achieved_count / Variable.AGENT_NUM * 100;
+                agent_percent = (double)finish_agent / Variable.AGENT_NUM * 100;
                 percent_recorder.append(String.valueOf(i+1));
                 percent_recorder.append(",");
                 percent_recorder.append(String.valueOf(achieve_percent));
                 percent_recorder.append("\n");
+
+                agent_recorder.append(String.valueOf(i+1));
+                agent_recorder.append(",");
+                agent_recorder.append(String.valueOf(agent_percent));
+                agent_recorder.append("\n");
 
                 /*
                 if(agents[0].state.equals(("d"))){
@@ -326,6 +342,7 @@ public class PF_PSO_test{
 
             }
             percent_recorder.close();
+            agent_recorder.close();
             System.out.printf("achieved percent : %.2f%%\n", achieve_percent);
             System.out.printf("agent percent : %.2f%%\n", agent_percent);
         } catch (Exception e) {
