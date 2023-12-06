@@ -29,10 +29,10 @@ public class PF_PSO_test{
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             
             if(grid.table[i/Variable.M][i%Variable.M] == 0){
-                /*
-                if((i%Variable.M > 45 && i%Variable.M < 157) && (i/Variable.M > 44 && i/Variable.M < 156)){
-                } else {
-                */
+                
+                //if((i%Variable.M > 30 && i%Variable.M < 173) && (i/Variable.M > 30 && i/Variable.M < 173)){
+                //} else {
+                
                     randomList.add(i);
                 //}
             } else {
@@ -193,6 +193,7 @@ public class PF_PSO_test{
                 }
                 */
 
+                
                 fw[i] = new FileWriter("./csv_test/step"+String.valueOf(i+1)+".csv");
                 for (int j=0; j<Variable.AGENT_NUM; j++){
                     fw[i].append(String.valueOf(agents[j].col));
@@ -201,6 +202,7 @@ public class PF_PSO_test{
                     fw[i].append("\n");
                 }
                 fw[i].close();
+                
                 
                 for(int k=0; k<Variable.N; k++){
                     for(int s=0; s<Variable.M; s++){
@@ -341,10 +343,32 @@ public class PF_PSO_test{
                 }
 
             }
+            int not_count = 0;
+            int out_count = 0;
+            for (int j=0; j<Variable.AGENT_NUM; j++){
+                if(grid.table[agents[j].row][agents[j].col] == 0){
+                    if(grid.agent_pos[agents[j].row][agents[j].col] == 1){
+                        out_count += 1;
+                    }
+                }
+            }
+            for(int k=0; k<Variable.N; k++){
+                for(int s=0; s<Variable.M; s++){
+                    if(grid.table[k][s] == 1){
+                        if(grid.agent_pos[k][s] == 0){
+                            not_count += 1;
+                        }
+                    }
+                }
+            }
+            FileWriter critic_recorder = new FileWriter("./percent/critic.csv");
+            critic_recorder.append(String.valueOf(not_count + out_count));
+            critic_recorder.close();
             percent_recorder.close();
             agent_recorder.close();
             System.out.printf("achieved percent : %.2f%%\n", achieve_percent);
             System.out.printf("agent percent : %.2f%%\n", agent_percent);
+            System.out.printf("critic : %d\n", not_count + out_count);
         } catch (Exception e) {
             e.printStackTrace();
         }
