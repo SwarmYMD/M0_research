@@ -4,8 +4,8 @@ import environment.Agent_avoid;
 
 import java.util.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 
 public class PF_PSO_avoid{
     public static void main(String[] args) {
@@ -26,6 +26,8 @@ public class PF_PSO_avoid{
 
         FileWriter[] fw = new FileWriter[Variable.maxStep];
 
+        Agent_avoid[] agents = new Agent_avoid[Variable.AGENT_NUM];
+
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             
             if(grid.table[i/Variable.M][i%Variable.M] == 0){
@@ -33,7 +35,7 @@ public class PF_PSO_avoid{
                 //if((i%Variable.M > 30 && i%Variable.M < 173) && (i/Variable.M > 30 && i/Variable.M < 173)){
                 //} else {
                 
-                    randomList.add(i);
+                    //randomList.add(i);
                 //}
             } else {
                 pattern_num++;
@@ -41,18 +43,29 @@ public class PF_PSO_avoid{
             
             //randomList.add(i);
         }
-        Collections.shuffle(randomList);
+        //Collections.shuffle(randomList);
 
         //System.out.println(randomList);
 
         // Initial setting of agents.
-        Agent_avoid[] agents = new Agent_avoid[Variable.AGENT_NUM];
-        for (int i=0; i<Variable.AGENT_NUM; i++){
-            initial_pos = randomList.get(i);
-            agents[i] = new Agent_avoid(initial_pos%Variable.M, initial_pos/Variable.M);
-            agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
-            grid.recordPos(agents[i]);
-            //System.out.printf("(%d, %d)\n", agents[i].row, agents[i].col);
+        
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream("initial_pos.csv"), Charset.forName("Shift-JIS")))) {
+        
+            String line;
+            int index = 0;
+            while ((line = reader.readLine()) != null) {
+                if (index >= 0) {
+                    String[] data = line.split(",");
+                    
+                    agents[index] = new Agent_avoid(Integer.parseInt(data[0]), Integer.parseInt(data[1]));
+                    agents[index].areaNo = agents[index].getAreaNo(agents[index].row, agents[index].col);
+                    grid.recordPos(agents[index]);
+                }
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         for(int i=0; i<Variable.N; i++){
@@ -361,7 +374,18 @@ public class PF_PSO_avoid{
             }
             
             FileWriter critic_recorder = new FileWriter("./percent_avoid/critic.csv");
+            critic_recorder.append("not count");
+            critic_recorder.append(",");
+            critic_recorder.append(String.valueOf(not_count));
+            critic_recorder.append("\n");
+            critic_recorder.append("out count");
+            critic_recorder.append(",");
+            critic_recorder.append(String.valueOf(out_count));
+            critic_recorder.append("\n");
+            critic_recorder.append("critic value");
+            critic_recorder.append(",");
             critic_recorder.append(String.valueOf(not_count + out_count));
+            critic_recorder.append("\n");
             critic_recorder.close();
             percent_recorder.close();
             agent_recorder.close();
