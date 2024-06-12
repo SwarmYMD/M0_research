@@ -4,8 +4,8 @@ import environment.Agent_avoid;
 
 import java.util.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 
 public class PF_PSO_avoid{
     public static void main(String[] args) {
@@ -26,28 +26,46 @@ public class PF_PSO_avoid{
 
         FileWriter[] fw = new FileWriter[Variable.maxStep];
 
+        Agent_avoid[] agents = new Agent_avoid[Variable.AGENT_NUM];
+
         for(int i = 0 ; i < Variable.M * Variable.N ; i++) {
             
             if(grid.table[i/Variable.M][i%Variable.M] == 0){
-                randomList.add(i);
+                
+                //if((i%Variable.M > 30 && i%Variable.M < 173) && (i/Variable.M > 30 && i/Variable.M < 173)){
+                //} else {
+                
+                    //randomList.add(i);
+                //}
             } else {
                 pattern_num++;
             }
             
             //randomList.add(i);
         }
-        Collections.shuffle(randomList);
+        //Collections.shuffle(randomList);
 
         //System.out.println(randomList);
 
         // Initial setting of agents.
-        Agent_avoid[] agents = new Agent_avoid[Variable.AGENT_NUM];
-        for (int i=0; i<Variable.AGENT_NUM; i++){
-            initial_pos = randomList.get(i);
-            agents[i] = new Agent_avoid(initial_pos%Variable.M, initial_pos/Variable.M);
-            agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
-            grid.recordPos(agents[i]);
-            //System.out.printf("(%d, %d)\n", agents[i].row, agents[i].col);
+        
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream("initial_pos.csv"), Charset.forName("Shift-JIS")))) {
+        
+            String line;
+            int index = 0;
+            while ((line = reader.readLine()) != null) {
+                if (index >= 0) {
+                    String[] data = line.split(",");
+                    
+                    agents[index] = new Agent_avoid(Integer.parseInt(data[0]), Integer.parseInt(data[1]));
+                    agents[index].areaNo = agents[index].getAreaNo(agents[index].row, agents[index].col);
+                    grid.recordPos(agents[index]);
+                }
+                index++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         for(int i=0; i<Variable.N; i++){
@@ -336,10 +354,44 @@ public class PF_PSO_avoid{
                 }
 
             }
+            int not_count = 0;
+            int out_count = 0;
+            for (int j=0; j<Variable.AGENT_NUM; j++){
+                if(grid.table[agents[j].row][agents[j].col] == 0){
+                    if(grid.agent_pos[agents[j].row][agents[j].col] == 1){
+                        out_count += 1;
+                    }
+                }
+            }
+            for(int k=0; k<Variable.N; k++){
+                for(int s=0; s<Variable.M; s++){
+                    if(grid.table[k][s] == 1){
+                        if(grid.agent_pos[k][s] == 0){
+                            not_count += 1;
+                        }
+                    }
+                }
+            }
+            
+            FileWriter critic_recorder = new FileWriter("./percent_avoid/critic.csv");
+            critic_recorder.append("not count");
+            critic_recorder.append(",");
+            critic_recorder.append(String.valueOf(not_count));
+            critic_recorder.append("\n");
+            critic_recorder.append("out count");
+            critic_recorder.append(",");
+            critic_recorder.append(String.valueOf(out_count));
+            critic_recorder.append("\n");
+            critic_recorder.append("critic value");
+            critic_recorder.append(",");
+            critic_recorder.append(String.valueOf(not_count + out_count));
+            critic_recorder.append("\n");
+            critic_recorder.close();
             percent_recorder.close();
             agent_recorder.close();
             System.out.printf("achieved percent : %.2f%%\n", achieve_percent);
             System.out.printf("agent percent : %.2f%%\n", agent_percent);
+            System.out.printf("critic : %d\n", not_count + out_count);
         } catch (Exception e) {
             e.printStackTrace();
         }
