@@ -29,19 +29,28 @@ baseline（既存手法）についてはhttps://ieeexplore.ieee.org/abstract/do
 │  ├─GridDup.java\
 │  ├─Grid_avoid.java\
 │  ├─Grid_proposal.java\
-│  ├─Variable.java\
+│  └─Variable.java\
 ├─PF_PSO_origin.java\
 ├─PF_PSO_avoid.java\
 ├─PF_PSO_test.java\
 ├─PF_PSO_proposal.java\
 └─Position.java
 
+## コンパイル・実行手順
+for_KES2024直下で\
+```
+javac ./Position.java
+java Position
+javac ./PF_PSO_proposal.java ./environment/Variable.java ./environment/Agent_proposal.java ./environment/Grid_proposal.java
+java PF_PSO_proposal
+```
+他のファイルも、以下の各項目の箇条書きの番号にならう形で対応付けられている。
+
 ## 検証用プログラム
 1. PF_PSO_origin.java：baselineの実験検証のためのプログラム。
 2. PF_PSO_avoid.java：提案手法1のプログラム。移動先での重複回避のみを行う。
 3. PF_PSO_test.java：提案手法2のプログラム。パターン上に到達したエージェントが、一定時間ごとにランダムに動く。
 4. PF_PSO_proposal.java（Fixedや2024_forKESで追加）：提案手法3のプログラム。パターン上に到達したエージェントが、隣接地点にフェロモンを分泌。また、探索が進むとエリアの分割を少なくする。
-5. Position.java：初期位置を決定。実験の前に実行しておく（initial_pos〇.csvの形で出力）
 
 ## Agent定義
 1. AgentDup.java：baselineのAgent定義。Dupは重複を許すことから命名。
@@ -57,6 +66,7 @@ baseline（既存手法）についてはhttps://ieeexplore.ieee.org/abstract/do
 
 ## パラメータ群や環境サイズ等の数値決定
 Variable.java：ここで各パラメータを定義。
+Position.java：初期位置を決定。実験の前に実行しておく（initial_pos〇.csvの形で出力）
 
 ## データ整理
 実験結果はcsv形式で、各エージェント毎にその位置が記録される（/csv/step1.csv　など）。また、充填率（パターン全体に対するエージェントの占有率）も記録される（/percent/percent.csv　など）。
