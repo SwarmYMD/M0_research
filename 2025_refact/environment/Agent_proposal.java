@@ -59,7 +59,7 @@ public class Agent_proposal{
 
     double beta = 0.5;
 
-    Random random = new Random();
+    static Random random = new Random(0);
 
     // new variable
     int second_m = Variable.m/5;

@@ -1,6 +1,6 @@
 import environment.Variable;
-import environment.Grid;
-import environment.Agent;
+import environment.Grid_proposal;
+import environment.Agent_proposal;
 
 import java.util.*;
 
@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Position{
     public static void main(String[] args) {
-        Grid grid = new Grid();
+        Grid_proposal grid = new Grid_proposal();
 
         int initial_pos;
 
@@ -31,10 +31,10 @@ public class Position{
             }
             Collections.shuffle(randomList);
 
-            Agent[] agents = new Agent[Variable.AGENT_NUM];
+            Agent_proposal[] agents = new Agent_proposal[Variable.AGENT_NUM];
             for (int i=0; i<Variable.AGENT_NUM; i++){
                 initial_pos = randomList.get(i);
-                agents[i] = new Agent(initial_pos%Variable.M, initial_pos/Variable.M);
+                agents[i] = new Agent_proposal(initial_pos%Variable.M, initial_pos/Variable.M);
                 agents[i].areaNo = agents[i].getAreaNo(agents[i].row, agents[i].col);
                 grid.recordPos(agents[i]);
                 //System.out.printf("(%d, %d)\n", agents[i].row, agents[i].col);
